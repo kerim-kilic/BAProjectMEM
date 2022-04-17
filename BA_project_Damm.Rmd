@@ -1,0 +1,47 @@
+---
+title: |
+  Business Analytics: Damm Company Analysis
+author: "Kerim Kiliç, Georgi Gevorgyan, Mar Muñoz, Alejandro Urrea"
+date: '`r Sys.Date()`'
+output: 
+    prettydoc::html_pretty:
+      toc: true
+    theme: hpstr
+    highlight: github
+---
+
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = FALSE,warning = FALSE)
+library(tidyverse)
+library(janitor)
+Sys.setenv(LANG = "sp")
+```
+
+# Introduction
+```{r, echo = FALSE, message = FALSE}
+t_detallista <- read.csv("data/t_detallista.csv")
+t_material <- read.csv("data/material_preu_damm.csv")
+t_material_freqs <- read.csv("data/t_material_Freqs.csv")
+t_posiciones <- read.csv("data/t_posiciones.csv")
+```
+
+```{r, echo = FALSE, message = FALSE}
+
+```
+
+
+# Data cleaning
+
+```{r, echo=FALSE, message=FALSE}
+retailers <- t_detallista%>%clean_names()
+prices <- t_material%>%clean_names()
+quantity <- t_material_freqs%>%clean_names()
+orders <- t_posiciones%>%clean_names()
+```
+
+
+```{r}
+df <- merge(x=orders,y=prices,by="material")
+```
+
