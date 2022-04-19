@@ -42,16 +42,8 @@ orders <- t_posiciones%>%clean_names()
 
 
 ```{r}
-# Hello 
-# Hello Mar
+colnames(retailers) <- c("id_retailer", "id_establishment", "country", "distributor", "region",
+                         "area", "category","type", "type2", "customer")
+colnames(prices) <- c("material","price")
+colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", "measure_unit", "quantity")
 ```
-
-
-
-
-```{r}
-df <- merge(x=orders,y=prices,by="material")
-```
-
-
-
