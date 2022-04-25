@@ -120,7 +120,7 @@ orders <- orders %>% filter (customer != "NA")
 "Unit" variable
 ```{r}
 orders %>% tabyl(measure_unit)
-empty_unit <- nrow(orders[orders$measure_unit == NA,])
+empty_unit <- nrow(orders %>% filter(is.na(measure_unit)))
 empty_unit
 ```
 there are `r empty_unit` with no unit of measure
@@ -131,10 +131,10 @@ orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```
 
 ```{r}
-#zero_quantity <- nrow(orders[orders$quantity == 0,])
-#this doesn't work
+zero_quantity <- nrow(orders[orders$quantity == 0,])
+
 ```
-there are X with 0 litres
+There are `r zero_quantity` with zero quantity
 
 Delete those rows with a 0 in quantity and NA in the unit
 ```{r}

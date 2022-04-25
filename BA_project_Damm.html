@@ -245,10 +245,10 @@ a.sourceLine {
 ##         Litro 81958 7.122385e-01  8.992835e-01
 ##        Unidad    60 5.214172e-04  6.583495e-04
 ##          &lt;NA&gt; 23934 2.079933e-01            NA</code></pre>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>empty_unit <span class="ot">&lt;-</span> <span class="fu">nrow</span>(orders[orders<span class="sc">$</span>measure_unit <span class="sc">==</span> <span class="cn">NA</span>,])</span>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>empty_unit <span class="ot">&lt;-</span> <span class="fu">nrow</span>(orders <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">is.na</span>(measure_unit)))</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>empty_unit</span></code></pre></div>
-<pre><code>## [1] 115071</code></pre>
-<p>there are 115071 with no unit of measure</p>
+<pre><code>## [1] 23934</code></pre>
+<p>there are 23934 with no unit of measure</p>
 <p>“quantity” variable</p>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>orders <span class="sc">%&gt;%</span> <span class="fu">tabyl</span>(quantity) <span class="sc">%&gt;%</span> <span class="fu">select</span> (quantity) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code></pre></div>
 <pre><code>##     quantity       
@@ -258,9 +258,8 @@ a.sourceLine {
 ##  Mean   :   31293  
 ##  3rd Qu.:   24212  
 ##  Max.   :19643936</code></pre>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#zero_quantity &lt;- nrow(orders[orders$quantity == 0,])</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co">#this doesn&#39;t work</span></span></code></pre></div>
-<p>there are X with 0 litres</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>zero_quantity <span class="ot">&lt;-</span> <span class="fu">nrow</span>(orders[orders<span class="sc">$</span>quantity <span class="sc">==</span> <span class="dv">0</span>,])</span></code></pre></div>
+<p>There are 169 with zero quantity</p>
 <p>Delete those rows with a 0 in quantity and NA in the unit</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>orders <span class="ot">&lt;-</span> orders[<span class="sc">!</span>(orders<span class="sc">$</span>quantity <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> orders<span class="sc">$</span>measure_unit <span class="sc">==</span> <span class="cn">NA</span>),]</span></code></pre></div>
 </div>
