@@ -26,9 +26,6 @@ t_material_freqs <- read.csv("data/t_material_Freqs.csv")
 t_posiciones <- read.csv("data/t_posiciones.csv")
 ```
 
-```{r, echo = FALSE, message = FALSE}
-
-```
 
 
 # Data cleaning
@@ -47,3 +44,100 @@ colnames(retailers) <- c("X", "id_retailer", "id_establishment", "country", "dis
 colnames(prices) <- c("material","price")
 colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", "measure_unit", "quantity")
 ```
+
+
+## Cleaning Data "Orders"
+
+Check the top and the bottom of the data set
+```{r}
+orders %>% head(3)
+orders %>% tail(3)
+```
+
+There's no empty rows at the beggining or at the end of the dataset
+
+Check dupplicates
+```{r}
+orders %>% get_dupes()
+```
+There are no duplicates
+
+"X" variable
+
+This column doesn't give information, we can delete it 
+```{r}
+orders <- subset(orders, select = -c(X))
+```
+
+"id_establiment" varibale  
+```{r}
+orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
+```
+
+We delete the NA
+```{r}
+orders <- orders %>% filter (id_establishment != "NA")
+```
+
+"Data" variable
+```{r}
+orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
+orders$date <- format(as.Date(orders$date), "%d/%m/%Y")
+```
+
+We order ascending to see the first dates 
+```{r}
+orders <- orders[order(as.Date(orders$date, format="%d/%m/%Y")),]
+orders$date %>% head(20)
+```
+
+We asume that 0202 should be 2002
+```{r}
+orders$date <- ifelse (orders$date == "01/03/0202", "01/03/2002", orders$date)
+```
+
+We look at the the last dates 
+```{r}
+orders$date %>% tail(20)
+```
+
+We asume that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
+```{r}
+orders$date <- ifelse (orders$date == "09/04/2218", "09/04/2018", orders$date)
+orders$date <- ifelse (orders$date == "20/12/2202", "20/12/2022", orders$date)
+orders$date <- ifelse (orders$date == "05/12/2119", "05/12/2019", orders$date)
+```
+
+"Customer" variable
+
+We delete the NA's
+```{r}
+orders %>% tabyl(customer) %>% select (customer) %>% summary()
+orders <- orders %>% filter (customer != "NA")
+```
+
+
+"Unit" variable
+```{r}
+orders %>% tabyl(measure_unit)
+empty_unit <- nrow(orders[orders$measure_unit == NA,])
+empty_unit
+```
+there are `r empty_unit` with no unit of measure
+
+"quantity" variable
+```{r}
+orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
+```
+
+```{r}
+#zero_quantity <- nrow(orders[orders$quantity == 0,])
+#this doesn't work
+```
+there are X with 0 litres
+
+Delete those rows with a 0 in quantity and NA in the unit
+```{r}
+orders <- orders[!(orders$quantity == 0 & orders$measure_unit == NA),]
+```
+
