@@ -19,6 +19,9 @@ Sys.setenv(LANG = "sp")
 ```
 
 # Introduction
+
+Reading in the data and cleaning the column titles
+
 ```{r, echo = FALSE, message = FALSE}
 t_detallista <- read.csv("data/t_detallista.csv")
 t_material <- read.csv("data/material_preu_damm.csv")
@@ -46,7 +49,7 @@ colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", "
 ```
 
 
-## Cleaning Data "Orders"
+### Cleaning Data "Orders"
 
 Check the top and the bottom of the data set
 ```{r}
@@ -139,5 +142,25 @@ There are `r zero_quantity` with zero quantity
 Delete those rows with a 0 in quantity and NA in the unit
 ```{r}
 orders <- orders[!(orders$quantity == 0 & orders$measure_unit == NA),]
+```
+
+### Cleaning Quantity Data
+Remove the X variable and check na values per column
+
+```{r}
+quantity$x <- NULL
+which(colSums(is.na(quantity)) > 0)
+```
+Remove the na values of the material column
+```{r}
+quantity <- quantity%>%filter(!is.na(material))
+```
+
+
+# Merging orders and prices
+
+```{r}
+# Merge orders and prices
+orders_prices <- merge(orders,prices,by="material")
 ```
 
