@@ -57,9 +57,9 @@ orders %>% head(3)
 orders %>% tail(3)
 ```
 
-There's no empty rows at the beggining or at the end of the dataset
+There's no empty rows at the beginning or at the end of the dataset
 
-Check dupplicates
+Check duplicates
 ```{r}
 orders %>% get_dupes()
 ```
@@ -72,17 +72,17 @@ This column doesn't give information, we can delete it
 orders <- subset(orders, select = -c(X))
 ```
 
-"id_establiment" varibale  
+"id_establiment" variable  
 ```{r}
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
 
-We delete the NA
+We delete the NA values
 ```{r}
 orders <- orders %>% filter (id_establishment != "NA")
 ```
 
-"Data" variable
+"Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
 orders$date <- format(as.Date(orders$date), "%d/%m/%Y")
@@ -94,7 +94,7 @@ orders <- orders[order(as.Date(orders$date, format="%d/%m/%Y")),]
 orders$date %>% head(20)
 ```
 
-We asume that 0202 should be 2002
+We assume that 0202 should be 2002
 ```{r}
 orders$date <- ifelse (orders$date == "01/03/0202", "01/03/2002", orders$date)
 ```
@@ -104,7 +104,7 @@ We look at the the last dates
 orders$date %>% tail(20)
 ```
 
-We asume that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
+We assume that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
 ```{r}
 orders$date <- ifelse (orders$date == "09/04/2218", "09/04/2018", orders$date)
 orders$date <- ifelse (orders$date == "20/12/2202", "20/12/2022", orders$date)
