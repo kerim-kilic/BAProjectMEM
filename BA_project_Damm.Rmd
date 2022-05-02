@@ -85,30 +85,32 @@ orders <- orders %>% filter (id_establishment != "NA")
 "Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
-orders$date <- format(as.Date(orders$date), "%d/%m/%Y")
+
 ```
 
-We order ascending to see the first dates 
+We look at the first dates and last dates
 ```{r}
-orders <- orders[order(as.Date(orders$date, format="%d/%m/%Y")),]
 orders$date %>% head(20)
-```
-
-We assume that 0202 should be 2002
-```{r}
-orders$date <- ifelse (orders$date == "01/03/0202", "01/03/2002", orders$date)
-```
-
-We look at the the last dates 
-```{r}
 orders$date %>% tail(20)
 ```
 
-We assume that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
+We assume that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
 ```{r}
-orders$date <- ifelse (orders$date == "09/04/2218", "09/04/2018", orders$date)
-orders$date <- ifelse (orders$date == "20/12/2202", "20/12/2022", orders$date)
-orders$date <- ifelse (orders$date == "05/12/2119", "05/12/2019", orders$date)
+index <- c(1:nrow(orders))
+for (i in index) {
+  if (orders$date[i] == "0202-03-01"){
+    orders$date[i] <- "2002-03-01"
+  }
+  else if (orders$date[i] == "2218-04-09"){
+    orders$date[i] <- "2018-04-09"
+  }
+  else if (orders$date[i] == "2202-12-20"){
+    orders$date[i] <- "2022-12-20"
+  }
+  else if (orders$date[i] == "2119-12-05"){
+    orders$date[i] <- "2019-12-05"
+  }
+}
 ```
 
 "Customer" variable
@@ -157,10 +159,132 @@ quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
+# Adding the type of product
+
+```{r}
+prices <- prices %>% mutate(type = NA)
+
+
+index <- c(1:nrow(prices))
+
+for (i in index) {
+  AK <- grepl("AK", prices$material[i],  fixed = TRUE)
+  BOCK <- grepl("BOCK", prices$material[i],  fixed = TRUE)
+  COMPLOT <- grepl("COMPLOT", prices$material[i],  fixed = TRUE)
+  LEMON <- grepl("LEMON", prices$material[i],  fixed = TRUE)
+  ESTRELLA <- grepl("ESTRELLA", prices$material[i],  fixed = TRUE)
+  FREE <- grepl("FREE", prices$material[i],  fixed = TRUE)
+  INEDIT <- grepl("INEDIT", prices$material[i],  fixed = TRUE)
+  SAAZ <- grepl("SAAZ", prices$material[i],  fixed = TRUE)
+  TURIA <- grepl("TURIA", prices$material[i],  fixed = TRUE)
+  VOLL <- grepl("VOLL", prices$material[i],  fixed = TRUE)
+  WEISS <- grepl("WEISS", prices$material[i],  fixed = TRUE)
+  XIBECA <- grepl("XIBECA", prices$material[i],  fixed = TRUE)
+  GENERAL <- grepl("GENERAL", prices$material[i],  fixed = TRUE)
+  
+  if(AK == TRUE) {
+    prices$type[i] <- "AK"
+  }
+  else if(BOCK == TRUE) {
+    prices$type[i] <- "BOCK"
+  }
+  else if(COMPLOT == TRUE) {
+    prices$type[i] <- "COMPLOT"
+  }
+  else if(LEMON == TRUE) {
+    prices$type[i] <- "LEMON"
+  }
+  else if(ESTRELLA == TRUE) {
+    prices$type[i] <- "ESTRELLA"
+  }
+  else if(FREE == TRUE) {
+    prices$type[i] <- "FREE"
+  }
+  else if(INEDIT == TRUE) {
+    prices$type[i] <- "INEDIT"
+  }
+  else if(SAAZ == TRUE) {
+    prices$type[i] <- "SAAZ"
+  }
+  else if(TURIA == TRUE) {
+    prices$type[i] <- "TURIA"
+  }
+  else if(VOLL == TRUE) {
+    prices$type[i] <- "VOLL"
+  }
+  else if(WEISS == TRUE) {
+    prices$type[i] <- "WEISS"
+  }
+  else if(XIBECA == TRUE) {
+    prices$type[i] <- "XIBECA"
+  }
+  else if(GENERAL == TRUE) {
+    prices$type[i] <- "GENERAL"
+  }
+  else {
+    prices$type[i] <- "Other"
+  }
+  a<- c(AK, BOCK, COMPLOT, LEMON, ESTRELLA, FREE, INEDIT, SAAZ , TURIA, VOLL, WEISS, XIBECA, GENERAL) 
+  a <- FALSE  
+}
+
+```
+
 # Merging orders and prices
 
 ```{r}
 # Merge orders and prices
 orders_prices <- merge(orders,prices,by="material")
 ```
+
+# General overview of the data 
+Counting the number of times a type of article appears in an order. 
+
+```{r}
+orders_prices %>%
+  group_by(type)%>%
+  summarise(count = n()) %>%
+  mutate(percentage =  round((count/nrow(orders_prices))*100,2)) %>%
+  ggplot(aes(reorder(type, percentage), percentage, fill=type))+
+  geom_bar(stat="identity", position = "dodge") + 
+  coord_flip() + 
+  labs(title= "% of orders per product type", y = "% of Orders", x = "Type of prodcut ") +  
+  theme(legend.position = "none")
+```
+
+Order lines over time. We use order lines instead of orders, because there can be orders with just one line, and orders with a lot of lines, and they are not comparable. 
+
+```{r}
+orders$Month <- as.Date(cut(orders$date,
+                            breaks = "month"))
+
+
+orders %>% filter(date >= "2018-01-01" & date <= "2021-12-31") %>% group_by(Month) %>% 
+  summarise(count = n()) %>% ggplot(aes(Month, count)) + geom_line() +
+  geom_point() 
+```
+
+Top clients 
+```{r}
+tab_1 <- orders_prices %>%
+  group_by(id_establishment)%>%
+  summarise(count = n()) 
+
+tab_2 <- tab_1[order(-tab_1$count),]
+
+tab_2 %>% head(15)%>%
+  ggplot(aes(reorder(id_establishment, count), count, fill=id_establishment))+
+  geom_bar(stat="identity", position = "dodge") + 
+  coord_flip() + 
+  labs(title= "Order lines per client", y = " Order lines", x = "Client ") +  
+  theme(legend.position = "none")
+```
+
+clients with only 1 order line 
+
+```{r}
+tab_2 %>% filter(count == 1) %>% nrow()
+```
+
+
 
