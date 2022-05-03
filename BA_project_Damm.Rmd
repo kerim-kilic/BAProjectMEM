@@ -20,56 +20,52 @@ Sys.setenv(LANG = "sp")
 
 # Introduction
 
-Reading in the data and cleaning the column titles
+Reading in the data from the four tables. 
+[Describe each table and their corresponding variables.]
 
 ```{r, echo = FALSE, message = FALSE}
-t_detallista <- read.csv("data/t_detallista.csv")
-t_material <- read.csv("data/material_preu_damm.csv")
-t_material_freqs <- read.csv("data/t_material_Freqs.csv")
-t_posiciones <- read.csv("data/t_posiciones.csv")
+retailers <- read.csv("data/t_detallista.csv")
+prices <- read.csv("data/material_preu_damm.csv")
+quantity <- read.csv("data/t_material_Freqs.csv")
+orders <- read.csv("data/t_posiciones.csv")
 ```
 
+Translating the variable names to English
 
+```{r}
+colnames(retailers) <- c("X", "id_retailer", "id_establishment", "country", 
+                         "distributor", "region", "area", "category","type", 
+                         "type2", "customer")
+colnames(prices) <- c("material","price")
+colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", 
+                      "measure_unit", "quantity")
+```
 
 # Data cleaning
 
-```{r, echo=FALSE, message=FALSE}
-retailers <- t_detallista%>%clean_names()
-prices <- t_material%>%clean_names()
-quantity <- t_material_freqs%>%clean_names()
-orders <- t_posiciones%>%clean_names()
-```
-
+Function to clean column titles, remove empty rows and columns, remove constant variables, and remove duplicate values:
 
 ```{r}
-colnames(retailers) <- c("X", "id_retailer", "id_establishment", "country", "distributor", "region",
-                         "area", "category","type", "type2", "customer")
-colnames(prices) <- c("material","price")
-colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", "measure_unit", "quantity")
+clean_data <- function(dataset)
+{
+  ### Clean the names of the variables ###
+  dataset <- dataset %>% clean_names()
+  ### Remove the empty rows and colums ###
+  dataset <- dataset %>% remove_empty(which = c("rows","cols"))
+  ### Remove columns with constants ###
+  dataset <- dataset %>% remove_constant()
+  ### Remove duplicate values ###
+  dataset <- dataset %>% distinct()
+  return(dataset)
+}
 ```
 
+## Cleaning Data "Orders"
 
-### Cleaning Data "Orders"
+Run the clean_data() function to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
-Check the top and the bottom of the data set
 ```{r}
-orders %>% head(3)
-orders %>% tail(3)
-```
-
-There's no empty rows at the beginning or at the end of the dataset
-
-Check duplicates
-```{r}
-orders %>% get_dupes()
-```
-There are no duplicates
-
-"X" variable
-
-This column doesn't give information, we can delete it 
-```{r}
-orders <- subset(orders, select = -c(X))
+orders <- clean_data(orders) %>% select(-x)
 ```
 
 "id_establiment" variable  
@@ -77,15 +73,14 @@ orders <- subset(orders, select = -c(X))
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
 
-We delete the NA values
-```{r}
-orders <- orders %>% filter (id_establishment != "NA")
-```
+<!-- We delete the NA values -->
+<!-- ```{r} -->
+<!-- orders <- orders %>% filter(!is.na(id_establishment)) -->
+<!-- ``` -->
 
 "Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
-
 ```
 
 We look at the first dates and last dates
@@ -95,6 +90,7 @@ orders$date %>% tail(20)
 ```
 
 We assume that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
+
 ```{r}
 index <- c(1:nrow(orders))
 for (i in index) {
@@ -118,7 +114,7 @@ for (i in index) {
 We delete the NA's
 ```{r}
 orders %>% tabyl(customer) %>% select (customer) %>% summary()
-orders <- orders %>% filter (customer != "NA")
+orders <- orders %>% filter (!is.na(customer))
 ```
 
 
@@ -141,16 +137,16 @@ zero_quantity <- nrow(orders[orders$quantity == 0,])
 ```
 There are `r zero_quantity` with zero quantity
 
-Delete those rows with a 0 in quantity and NA in the unit
+Delete those rows with a 0 in quantity 
 ```{r}
-orders <- orders[!(orders$quantity == 0 & orders$measure_unit == NA),]
+orders <- orders %>% filter(quantity != 0)
 ```
 
-### Cleaning Quantity Data
+## Cleaning Quantity Data
 Remove the X variable and check na values per column
 
 ```{r}
-quantity$x <- NULL
+quantity <- clean_data(quantity) %>% select(-x)
 which(colSums(is.na(quantity)) > 0)
 ```
 Remove the na values of the material column
@@ -162,72 +158,24 @@ quantity <- quantity%>%filter(!is.na(material))
 # Adding the type of product
 
 ```{r}
-prices <- prices %>% mutate(type = NA)
-
-
-index <- c(1:nrow(prices))
-
-for (i in index) {
-  AK <- grepl("AK", prices$material[i],  fixed = TRUE)
-  BOCK <- grepl("BOCK", prices$material[i],  fixed = TRUE)
-  COMPLOT <- grepl("COMPLOT", prices$material[i],  fixed = TRUE)
-  LEMON <- grepl("LEMON", prices$material[i],  fixed = TRUE)
-  ESTRELLA <- grepl("ESTRELLA", prices$material[i],  fixed = TRUE)
-  FREE <- grepl("FREE", prices$material[i],  fixed = TRUE)
-  INEDIT <- grepl("INEDIT", prices$material[i],  fixed = TRUE)
-  SAAZ <- grepl("SAAZ", prices$material[i],  fixed = TRUE)
-  TURIA <- grepl("TURIA", prices$material[i],  fixed = TRUE)
-  VOLL <- grepl("VOLL", prices$material[i],  fixed = TRUE)
-  WEISS <- grepl("WEISS", prices$material[i],  fixed = TRUE)
-  XIBECA <- grepl("XIBECA", prices$material[i],  fixed = TRUE)
-  GENERAL <- grepl("GENERAL", prices$material[i],  fixed = TRUE)
-  
-  if(AK == TRUE) {
-    prices$type[i] <- "AK"
-  }
-  else if(BOCK == TRUE) {
-    prices$type[i] <- "BOCK"
-  }
-  else if(COMPLOT == TRUE) {
-    prices$type[i] <- "COMPLOT"
-  }
-  else if(LEMON == TRUE) {
-    prices$type[i] <- "LEMON"
-  }
-  else if(ESTRELLA == TRUE) {
-    prices$type[i] <- "ESTRELLA"
-  }
-  else if(FREE == TRUE) {
-    prices$type[i] <- "FREE"
-  }
-  else if(INEDIT == TRUE) {
-    prices$type[i] <- "INEDIT"
-  }
-  else if(SAAZ == TRUE) {
-    prices$type[i] <- "SAAZ"
-  }
-  else if(TURIA == TRUE) {
-    prices$type[i] <- "TURIA"
-  }
-  else if(VOLL == TRUE) {
-    prices$type[i] <- "VOLL"
-  }
-  else if(WEISS == TRUE) {
-    prices$type[i] <- "WEISS"
-  }
-  else if(XIBECA == TRUE) {
-    prices$type[i] <- "XIBECA"
-  }
-  else if(GENERAL == TRUE) {
-    prices$type[i] <- "GENERAL"
-  }
-  else {
-    prices$type[i] <- "Other"
-  }
-  a<- c(AK, BOCK, COMPLOT, LEMON, ESTRELLA, FREE, INEDIT, SAAZ , TURIA, VOLL, WEISS, XIBECA, GENERAL) 
-  a <- FALSE  
-}
-
+prices <- prices %>%
+  mutate(type = case_when(grepl("AK", material,  fixed = TRUE) ~ "AK",
+                          grepl("BOCK", material,  fixed = TRUE) ~ "BOCK",
+                          grepl("COMPLOT", material,  fixed = TRUE) ~ "COMPLOT",
+                          grepl("LEMON", material,  fixed = TRUE) ~ "LEMON",
+                          grepl("ESTRELLA", material,  fixed = TRUE) ~ "ESTRELLA",
+                          grepl("FREE", material,  fixed = TRUE) ~ "FREE",
+                          grepl("INEDIT", material,  fixed = TRUE) ~ "INEDIT",
+                          grepl("SAAZ", material,  fixed = TRUE) ~ "SAAZ",
+                          grepl("TURIA", material,  fixed = TRUE) ~ "TURIA",
+                          grepl("VOLL", material,  fixed = TRUE) ~ "VOLL",
+                          grepl("WEISS", material,  fixed = TRUE) ~ "WEISS",
+                          grepl("XIBECA", material,  fixed = TRUE) ~ "XIBECA",
+                          grepl("GENERAL", material,  fixed = TRUE) ~ "GENERAL",
+                          grepl("GRUPO DAMM", material,  fixed = TRUE) ~ "GRUPO DAMM",
+                          grepl("DAURA", material,  fixed = TRUE) ~ "DAURA",
+                          grepl("DAMM", material,  fixed = TRUE) ~ "DAMM",
+                          grepl("EQUILATER", material,  fixed = TRUE) ~ "EQUILATER"))
 ```
 
 # Merging orders and prices
@@ -238,6 +186,7 @@ orders_prices <- merge(orders,prices,by="material")
 ```
 
 # General overview of the data 
+
 Counting the number of times a type of article appears in an order. 
 
 ```{r}
@@ -285,6 +234,3 @@ clients with only 1 order line
 ```{r}
 tab_2 %>% filter(count == 1) %>% nrow()
 ```
-
-
-
