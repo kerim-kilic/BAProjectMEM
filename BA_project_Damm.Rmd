@@ -96,21 +96,10 @@ We assume that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and tha
 <!-- This code needs to be optimized on runtime -->
 
 ```{r}
-index <- c(1:nrow(orders))
-for (i in index) {
-  if (orders$date[i] == "0202-03-01"){
-    orders$date[i] <- "2002-03-01"
-  }
-  else if (orders$date[i] == "2218-04-09"){
-    orders$date[i] <- "2018-04-09"
-  }
-  else if (orders$date[i] == "2202-12-20"){
-    orders$date[i] <- "2022-12-20"
-  }
-  else if (orders$date[i] == "2119-12-05"){
-    orders$date[i] <- "2019-12-05"
-  }
-}
+orders$date <- ifelse(orders$date == "0202-03-01", "2002-03-01", as.character(orders$date))
+orders$date <- ifelse(orders$date == "2218-04-09", "2018-04-09", as.character(orders$date))
+orders$date <- ifelse(orders$date == "2119-12-05", "2019-12-05", as.character(orders$date))
+orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
 "Customer" variable
