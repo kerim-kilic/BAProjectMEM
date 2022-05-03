@@ -234,3 +234,39 @@ clients with only 1 order line
 ```{r}
 tab_2 %>% filter(count == 1) %>% nrow()
 ```
+
+
+
+# Association rule analysis
+
+```{r}
+date_customer <- data.frame(orders_prices$date,orders_prices$customer)
+colnames(date_customer) <- c("date","customer")
+
+date_customer <- date_customer %>%
+  group_by(customer, date) %>%
+  unique()
+# Create fictional transaction ID to mine asociation rules
+test <- date_customer %>% rowid_to_column(var='transaction_id')
+new_data <- merge(orders_prices,test)
+
+# Create matrix
+table <- new_data %>%
+  select(transaction, type) %>%
+  distinct() %>%
+  mutate(value = TRUE) %>%
+  pivot_wider(transaction, names_from = type, values_from = value)
+
+matrix <- as(table %>% select(-transaction), "transactions")
+
+rules <- apriori(matrix,
+                 parameter = list(supp = 0.01, conf = 0.8))
+rules_df <- as(rules, "data.frame")
+
+rules_df %>% 
+  arrange(-lift) %>%
+  select(rules, support, lift, count)
+```
+
+
+
