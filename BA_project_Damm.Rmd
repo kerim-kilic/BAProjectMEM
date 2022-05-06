@@ -99,6 +99,9 @@ We assume that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and tha
 orders$date <- ifelse(orders$date == "0202-03-01", "2002-03-01", as.character(orders$date))
 orders$date <- ifelse(orders$date == "2218-04-09", "2018-04-09", as.character(orders$date))
 orders$date <- ifelse(orders$date == "2119-12-05", "2019-12-05", as.character(orders$date))
+orders$date <- ifelse(orders$date == "2202-12-20", "2020-12-20", as.character(orders$date))
+orders$date <- ifelse(orders$date == "2024-01-01", "2021-01-01", as.character(orders$date))
+orders$date <- ifelse(orders$date == "2022-07-14", "2021-07-14", as.character(orders$date))
 orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
