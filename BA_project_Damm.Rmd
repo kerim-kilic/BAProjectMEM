@@ -231,6 +231,36 @@ clients with only 1 order line
 tab_2 %>% filter(count == 1) %>% nrow()
 ```
 
+# Geographical representation
+
+```{r}
+##USA <- ggplot2::map_data('county', 'Massachusetts') %>% filter(long<-70.5 &long >-71.5 & lat>41.9&lat<42.6 &subregion!="barnstable" ) 
+
+##p2 <- ggplot()+geom_polygon(data=USA, aes(x=long,y=lat, group=group)) + geom_point(data=boston, size=.2, aes(x=LON, y=LAT, color=MEDV)) + coord_equal(ratio=1) + labs(title="Median Value")
+
+#Spain <- map_data("world", region = "Spain")
+#ggplot() + geom_polygon(data = Spain, aes(x = long, y = lat, group = group))
+#Spain <- esp_get_country()
+
+provinces <- read.csv("data/capitals-locations.csv")
+
+# Merge Retailers and Provinces
+retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "ï..PROVINCIA")
+
+# Merge Orders, Retailers and Provinces
+orders_retailers_capitals <- merge(orders_prices, provinces, by.x = "region", by.y = "ï..PROVINCIA")
+
+Spain <- esp_get_prov()
+
+
+
+ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
+  geom_point(data = provinces, aes(x = Longitud, y = Latitud))
+
+```
+
+
+
 # RFM
 
 ```{r}
