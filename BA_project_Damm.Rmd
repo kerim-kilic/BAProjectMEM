@@ -228,6 +228,64 @@ clients with only 1 order line
 tab_2 %>% filter(count == 1) %>% nrow()
 ```
 
+# RFM
+
+```{r}
+#add column revenue
+library(rfm)
+
+#add column revenue
+
+orders_prices <- orders_prices%>% mutate(revenue = quantity * price)
+
+### ----create rfm score -------------------------------------------------------
+rfm_result <- rfm_table_order(orders_prices, customer, date, revenue, Sys.Date())
+
+## ----heat map of the situation ----------------------------------------------
+rfm_heatmap(rfm_result)
+
+## ----bar chart of the situation ----------------------------------------------
+rfm_bar_chart(rfm_result)
+
+## ----histogram---------------------------------------------------------------
+rfm_histograms(rfm_result)
+
+## ----customer by order---------------------------------------------------------
+rfm_order_dist(rfm_result)
+
+## ----some scatter plots---------------------------------------------------------
+rfm_rm_plot(rfm_result)
+rfm_fm_plot(rfm_result)
+rfm_rf_plot(rfm_result)
+
+## ======RFM - segments=========================================================
+
+segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
+                   "New Customers", "Promising", "Need Attention", "About To Sleep",
+                   "At Risk", "Can't Lose Them", "Hibernating", "Lost")
+
+recency_lower   <- c(4, 2, 3, 4, 3, 3, 2, 1, 1, 2, 1)
+recency_upper   <- c(5, 4, 5, 5, 4, 4, 3, 2, 1, 3, 1)
+frequency_lower <- c(4, 3, 1, 1, 1, 3, 1, 2, 4, 2, 1)
+frequency_upper <- c(5, 4, 3, 1, 1, 4, 2, 5, 5, 3, 1)
+monetary_lower  <- c(4, 4, 1, 1, 1, 3, 1, 2, 4, 2, 1)
+monetary_upper  <- c(5, 5, 3, 1, 1, 4, 2, 5, 5, 3, 1)
+
+segments <- rfm_segment(rfm_result, segment_names, recency_lower, recency_upper,
+                        frequency_lower, frequency_upper, monetary_lower, monetary_upper)
+
+
+## ----average monetary value----------------------------------------------
+rfm_plot_median_monetary(segments)
+
+## ----average recency-----------------------------------------------------
+rfm_plot_median_recency(segments)
+
+## ----average frequency---------------------------------------------------
+rfm_plot_median_frequency(segments)
+```
+
+
 
 
 # Association rule analysis
