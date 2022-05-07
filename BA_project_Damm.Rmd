@@ -234,13 +234,28 @@ tab_2 %>% filter(count == 1) %>% nrow()
 # Geographical representation
 
 ```{r}
-##USA <- ggplot2::map_data('county', 'Massachusetts') %>% filter(long<-70.5 &long >-71.5 & lat>41.9&lat<42.6 &subregion!="barnstable" ) 
+#more cleaning: cleaning ES/ at region
+# replacing ES/ values by those from entries where the region is known based on the id_establishment
+retailers_ES <- retailers %>% filter(region == "ES/")
+retailers_noES <- retailers %>% filter(region != "ES/")
+retailers_noES_unique <- retailers_noES %>% distinct(id_establishment, region)
 
-##p2 <- ggplot()+geom_polygon(data=USA, aes(x=long,y=lat, group=group)) + geom_point(data=boston, size=.2, aes(x=LON, y=LAT, color=MEDV)) + coord_equal(ratio=1) + labs(title="Median Value")
+for (i in 1:length(retailers_ES$region)) {
+  id <- retailers_ES$id_establishment[i]
+  for (j in 1:length(retailers_noES_unique$region)) {
+    if(id == retailers_noES_unique$id_establishment[j]){
+      retailers_ES$region[i] = retailers_noES_unique$region[j]
+      break
+    }
+  }
+}
 
-#Spain <- map_data("world", region = "Spain")
-#ggplot() + geom_polygon(data = Spain, aes(x = long, y = lat, group = group))
-#Spain <- esp_get_country()
+retailers <- rbind(retailers_noES, retailers_ES)
+
+#deleting remaining "ES/" and "/" values
+
+retailers <- retailers %>% filter(region != "ES/")
+retailers <- retailers %>% filter(region != "/")
 
 provinces <- read.csv("data/capitals-locations.csv")
 
@@ -248,14 +263,22 @@ provinces <- read.csv("data/capitals-locations.csv")
 retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "ï..PROVINCIA")
 
 # Merge Orders, Retailers and Provinces
-orders_retailers_capitals <- merge(orders_prices, provinces, by.x = "region", by.y = "ï..PROVINCIA")
+orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
+
+orders_retailers_capitals <- orders_retailers_capitals %>% distinct(id_establishment,material, quantity, price, Capital, Latitud, Longitud, Habitantes)
+
+#summary for map
+#adding revenue
+orders_retailers_capitals <- orders_retailers_capitals %>% mutate(Revenue = price * quantity)
+
+Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>% summarise(Sales = sum(Revenue), Habitantes = mean(Habitantes), Longitude = mean(Longitud), Latitude = mean(Latitud))
+
+library(mapSpain)
 
 Spain <- esp_get_prov()
 
-
-
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
-  geom_point(data = provinces, aes(x = Longitud, y = Latitud))
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales)) 
 
 ```
 
