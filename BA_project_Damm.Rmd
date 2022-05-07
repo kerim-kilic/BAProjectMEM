@@ -271,7 +271,9 @@ orders_retailers_capitals <- orders_retailers_capitals %>% distinct(id_establish
 #adding revenue
 orders_retailers_capitals <- orders_retailers_capitals %>% mutate(Revenue = price * quantity)
 
-Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>% summarise(Sales = sum(Revenue), Habitantes = mean(Habitantes), Longitude = mean(Longitud), Latitude = mean(Latitud))
+Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>%
+  summarise(Sales = sum(Revenue), Habitantes = mean(Habitantes),
+            Longitude = mean(Longitud), Latitude = mean(Latitud))
 
 library(mapSpain)
 
