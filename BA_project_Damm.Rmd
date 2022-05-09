@@ -270,6 +270,21 @@ orders_prices %>%
 
 Order lines over time. We use order lines instead of orders, because there can be orders with just one line, and orders with a lot of lines, and they are not comparable. 
 
+Orders over years 
+
+```{r}
+orders$Year <- as.Date(cut(orders$date,
+                            breaks = "year"))
+
+#I want to add colour per product type, I am not able 
+
+orders %>% group_by(Year) %>% 
+  summarise(count = n()) %>% ggplot(aes(Year, count)) + geom_line() +
+  geom_point()  + 
+  labs(title= "Orders over years", y = " Order lines", x = "Year ")
+```
+
+Orders over months
 ```{r}
 orders$Month <- as.Date(cut(orders$date,
                             breaks = "month"))
@@ -299,7 +314,32 @@ tab_2 %>% head(15)%>%
 clients with only 1 order line 
 
 ```{r}
-tab_2 %>% filter(count == 1) %>% nrow()
+one_order_line <- tab_2 %>% filter(count == 1) %>% nrow()
+```
+There are `r one_order_line` clients with only 1 order line. 
+
+Retailers per location
+
+```{r}
+
+tab_3 <- retailers %>%
+  group_by(region)%>%
+  summarise(count = n()) %>%
+  mutate(percentage =  round((count/nrow(retailers))*100,2))
+  
+tab_4 <- tab_3[order(-tab_3$percentage),] 
+
+tab_4%>%head(15)%>%
+  ggplot(aes(reorder(region, percentage), percentage, fill=region))+
+  geom_bar(stat="identity", position = "dodge") + 
+  coord_flip() + 
+  labs(title= "% of retailers per region", y = "% of Retailers", x = "Region") +  
+  theme(legend.position = "none")
+
+
+#clean better the region names 
+retailers %>% tabyl(region)
+#delete / and change CORUÃ‘A, what happens with /ES? 
 ```
 
 # Geographical representation
