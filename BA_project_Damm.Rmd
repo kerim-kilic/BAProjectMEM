@@ -17,6 +17,8 @@ library(tidyverse)
 library(janitor)
 library(arules)
 library(formattable)
+library(rfm)
+library(mapSpain)
 Sys.setenv(LANG = "sp")
 ```
 
@@ -129,7 +131,6 @@ orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 
 ```{r}
 zero_quantity <- nrow(orders[orders$quantity == 0,])
-
 ```
 There are `r zero_quantity` with zero quantity
 
@@ -180,6 +181,76 @@ prices <- prices %>%
 # Merge orders and prices
 orders_prices <- merge(orders,prices,by="material")
 ```
+
+
+## Cleaning up the data of Retailers
+
+```{r}
+retailers <- clean_data(retailers) %>% select(-x)
+```
+
+Now, let's check which columns/variables have missing data
+```{r}
+which(colSums(is.na(retailers)) > 0)
+```
+
+Let's take a look at the types of the restaurants
+```{r}
+nrow(retailers[is.na(retailers$type),])
+nrow(retailers[is.na(retailers$type2),])
+```
+
+We see that there are `r nrow(retailers[is.na(retailers$type),])` entries out of `r nrow(retailers)` total that are missing the type of the restaurant, and only `r nrow(retailers[is.na(retailers$type2),])` that are missing 'type2'. Thus, we will treat "type2" as the general type of the restaurant, and in case missing, will replace it with "type" and in case both are missing, will consider deleting that entry.
+
+```{r echo=FALSE, include = FALSE}
+ifelse(!is.na(retailers$type2), retailers$type <- retailers$type2, retailers$type )
+retailers$type2 <- NULL
+```
+
+Now, let's take a look at the other missing variables
+```{r}
+which(colSums(is.na(retailers)) > 0)
+retailers[is.na(retailers$country),]
+```
+
+For country, the last two missing entries are clearly in Spain, the first one has already other missing variables as well, so we will just delete it.
+
+```{r}
+retailers[retailers$id_retailer == '9100245153',]$country <- 'España'
+retailers[retailers$id_retailer == '9100366860',]$country <- 'España'
+retailers <- subset(retailers, retailers$id_retailer != '9100399677')
+```
+
+Now, let's take a look at the area and region
+```{r}
+nrow(retailers[is.na(retailers$area),])
+nrow(retailers[is.na(retailers$region),])
+retailers[is.na(retailers$region),]
+```
+
+We see that we have only `r nrow(retailers[is.na(retailers$region),])` missing region variable and `r nrow(retailers[is.na(retailers$area),])` area entries. Furthermore, within the scope of our analysis we won't be looking through the specific areas within the cities or regions, and so the *area* variable is redundant and can be removed at all.
+
+```{r}
+retailers$area <- NULL
+retailers <- subset(retailers, !is.na(retailers$region))
+```
+
+Looking through the category data we see a lot of NA values, and after looking through the types of the categories we realize that those are just the 'regular' retailers, so we will just replace NAs with type 'Regular'.
+```{r}
+tabyl(retailers$category)
+retailers$category <- ifelse(is.na(retailers$category), "Regular", retailers$category)
+```
+
+
+Last up is the customer values.
+
+There are only `r nrow(retailers[is.na(retailers$customer),])` customer values missing. Since we might need clean customer values for later merging with orders table, we will just remove the rows with NAs, as it will not affect our data anyhow.
+
+```{r}
+retailers <- subset(retailers, !is.na(retailers$customer))
+```
+
+
 
 # General overview of the data 
 
@@ -260,7 +331,7 @@ retailers <- retailers %>% filter(region != "/")
 provinces <- read.csv("data/capitals-locations.csv")
 
 # Merge Retailers and Provinces
-retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "ï..PROVINCIA")
+retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
 
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
@@ -275,8 +346,6 @@ Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>%
   summarise(Sales = sum(Revenue), Habitantes = mean(Habitantes),
             Longitude = mean(Longitud), Latitude = mean(Latitud))
 
-library(mapSpain)
-
 Spain <- esp_get_prov()
 
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
@@ -290,10 +359,6 @@ ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
 
 ```{r}
 #add column revenue
-library(rfm)
-
-#add column revenue
-
 orders_prices <- orders_prices%>% mutate(revenue = quantity * price)
 
 ### ----create rfm score -------------------------------------------------------
