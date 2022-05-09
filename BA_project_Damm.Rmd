@@ -233,12 +233,13 @@ We see that we have only `r nrow(retailers[is.na(retailers$region),])` missing r
 ```{r}
 retailers$area <- NULL
 retailers <- subset(retailers, !is.na(retailers$region))
+tabyl(retailers$region)
 ```
 
-Looking through the category data we see a lot of NA values, and after looking through the types of the categories we realize that those are just the 'regular' retailers, so we will just replace NAs with type 'Regular'.
+Looking through the category data we see a lot of NA values, and after checking with the company, we realized that they are not classified yet. Thus, we will mark them so for now and classify them afterwards as part of our work. 
 ```{r}
 tabyl(retailers$category)
-retailers$category <- ifelse(is.na(retailers$category), "Regular", retailers$category)
+retailers$category <- ifelse(is.na(retailers$category), "Non_classified", retailers$category)
 ```
 
 
