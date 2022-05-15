@@ -60,10 +60,10 @@ Reading in the data from the four tables.
 [Describe each table and their corresponding variables.]
 
 ```{r, echo = FALSE, message = FALSE}
-retailers <- read.csv("data/t_detallista.csv")
-prices <- read.csv("data/material_preu_damm.csv")
-quantity <- read.csv("data/t_material_Freqs.csv")
-orders <- read.csv("data/t_posiciones.csv")
+retailers <- read.csv("data/t_detallista.csv", encoding = 'UTF-8')
+prices <- read.csv("data/material_preu_damm.csv", encoding = 'UTF-8')
+quantity <- read.csv("data/t_material_Freqs.csv", encoding = 'UTF-8')
+orders <- read.csv("data/t_posiciones.csv", encoding = 'UTF-8')
 ```
 
 Translating the variable names to English
