@@ -15,6 +15,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE,message = FALSE,warning = FALSE)
 library(tidyverse)
 library(janitor)
+library (lubridate)
 library(arules)
 library(formattable)
 library(rfm)
@@ -23,6 +24,37 @@ Sys.setenv(LANG = "sp")
 ```
 
 # Introduction
+
+This documents aims to  help the company DDI to develop a good commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
+
+# Setup the software
+
+The software used for the development of the study and the writing of the report is R[1]. The first step is to define the work directory and to load the libraries: 
+
+* library(tidyverse)
+* library(janitor)
+* library (lubridate)
+* library(arules)
+* library(formattable)
+* library(rfm)
+* library(mapSpain)
+
+# Data
+
+The data used in this report is the one provided by DDI. This data is located in 4 different tables, which are: 
+
+* t_detallista
+* material_preu_damm
+* t_material_Freqs
+* t_posiciones
+
+The table t_datallista, from now on referred as retailers. 
+
+In addition, the table material_preu_damm, now referred as prices. 
+
+Then, there is the table t_material_Freqs, now called quantity.  
+
+Lastly, there is the table t_posiciones, now called orders. 
 
 Reading in the data from the four tables. 
 [Describe each table and their corresponding variables.]
@@ -47,7 +79,8 @@ colnames(orders) <- c("X", "id_establishment", "date", "material", "customer",
 
 # Data cleaning
 
-Function to clean column titles, remove empty rows and columns, remove constant variables, and remove duplicate values:
+In this section, the original data provided will be cleaned. In order to do that, first a function to clean the data will be defined. This function will clean column titles, remove empty rows and columns, remove constant variables, and remove duplicate values. 
+
 
 ```{r}
 clean_data <- function(dataset)
@@ -66,13 +99,16 @@ clean_data <- function(dataset)
 
 ## Cleaning Data "Orders"
 
+Now, the table Orders will be cleaned. 
+
 Run the clean_data() function to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
+
 
 ```{r}
 orders <- clean_data(orders) %>% select(-x)
 ```
 
-"id_establiment" variable  
+### "id_establiment" variable  
 ```{r}
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
@@ -82,7 +118,7 @@ orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 <!-- orders <- orders %>% filter(!is.na(id_establishment)) -->
 <!-- ``` -->
 
-"Date" variable
+### "Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
 ```
@@ -107,7 +143,7 @@ orders$date <- ifelse(orders$date == "2022-07-14", "2021-07-14", as.character(or
 orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
-"Customer" variable
+### "Customer" variable
 
 We delete the NA's
 ```{r}
@@ -116,7 +152,7 @@ orders <- orders %>% filter (!is.na(customer))
 ```
 
 
-"Unit" variable
+### "Unit" variable
 ```{r}
 orders %>% tabyl(measure_unit)
 empty_unit <- nrow(orders %>% filter(is.na(measure_unit)))
@@ -124,7 +160,7 @@ empty_unit
 ```
 there are `r empty_unit` with no unit of measure
 
-"quantity" variable
+### "quantity" variable
 ```{r}
 orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```
@@ -152,7 +188,7 @@ quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
-# Adding the type of product
+## Adding the type of product
 
 ```{r}
 prices <- prices %>%
@@ -175,7 +211,7 @@ prices <- prices %>%
                           grepl("EQUILATER", material,  fixed = TRUE) ~ "EQUILATER"))
 ```
 
-# Merging orders and prices
+## Merging orders and prices
 
 ```{r}
 # Merge orders and prices
@@ -263,6 +299,7 @@ orders_prices %>%
   summarise(count = n()) %>%
   mutate(percentage =  round((count/nrow(orders_prices))*100,2)) %>%
   ggplot(aes(reorder(type, percentage), percentage, fill=type))+
+  geom_text(aes(label=percentage), hjust=-0.01)+
   geom_bar(stat="identity", position = "dodge") + 
   coord_flip() + 
   labs(title= "% of orders per product type", y = "% of Orders", x = "Type of prodcut ") +  
@@ -287,13 +324,20 @@ orders %>% group_by(Year) %>%
 
 Orders over months
 ```{r}
+
 orders$Month <- as.Date(cut(orders$date,
                             breaks = "month"))
 
 
-orders %>% filter(date >= "2018-01-01" & date <= "2021-12-31") %>% group_by(Month) %>% 
-  summarise(count = n()) %>% ggplot(aes(Month, count)) + geom_line() +
-  geom_point() 
+a1<- orders %>% filter(date >= "2018-01-01" & date <= "2021-05-30") %>% group_by(Month) %>% 
+  summarise(count = n())
+
+  
+a1%>%ggplot(aes(Month, count)) + geom_line() +
+  geom_point()+
+  geom_label(data = a1 %>% filter(month(Month) == 1), aes(label=count))+
+  geom_vline(xintercept = as.numeric(as.Date("2020-03-15")), linetype=5, colour="red")+
+  labs(title= "Orders over months", y = " Order lines", x = "Month ") 
 ```
 
 Top clients 
@@ -332,18 +376,15 @@ tab_4 <- tab_3[order(-tab_3$percentage),]
 
 tab_4%>%head(15)%>%
   ggplot(aes(reorder(region, percentage), percentage, fill=region))+
+  geom_text(aes(label=percentage), hjust=-0.01)+
   geom_bar(stat="identity", position = "dodge") + 
   coord_flip() + 
   labs(title= "% of retailers per region", y = "% of Retailers", x = "Region") +  
   theme(legend.position = "none")
 
-
-#clean better the region names 
-retailers %>% tabyl(region)
-#delete / and change CORUÃ‘A, what happens with /ES? 
 ```
 
-# Geographical representation
+## Geographical representation
 
 ```{r}
 #more cleaning: cleaning ES/ at region
