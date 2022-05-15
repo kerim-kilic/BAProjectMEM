@@ -410,10 +410,10 @@ retailers <- rbind(retailers_noES, retailers_ES)
 retailers <- retailers %>% filter(region != "ES/")
 retailers <- retailers %>% filter(region != "/")
 
-provinces <- read.csv("data/capitals-locations.csv")
+provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
 
 # Merge Retailers and Provinces
-retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "ï..PROVINCIA")
+retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
 
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
