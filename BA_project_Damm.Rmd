@@ -372,7 +372,7 @@ retailers <- retailers %>% filter(region != "/")
 provinces <- read.csv("data/capitals-locations.csv")
 
 # Merge Retailers and Provinces
-retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
+retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "ï..PROVINCIA")
 
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
