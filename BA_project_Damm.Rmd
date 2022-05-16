@@ -393,15 +393,9 @@ retailers_ES <- retailers %>% filter(region == "ES/")
 retailers_noES <- retailers %>% filter(region != "ES/")
 retailers_noES_unique <- retailers_noES %>% distinct(id_establishment, region)
 
-for (i in 1:length(retailers_ES$region)) {
-  id <- retailers_ES$id_establishment[i]
-  for (j in 1:length(retailers_noES_unique$region)) {
-    if(id == retailers_noES_unique$id_establishment[j]){
-      retailers_ES$region[i] = retailers_noES_unique$region[j]
-      break
-    }
-  }
-}
+retailers_ES <- merge(retailers_ES, retailers_noES_unique, by = "id_establishment")
+retailers_ES <- retailers_ES %>% select(-region.x) %>%
+  mutate(region = region.y) %>% select(-region.y)
 
 retailers <- rbind(retailers_noES, retailers_ES)
 
