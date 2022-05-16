@@ -535,4 +535,26 @@ formattable(rules_df,
 ```
 
 
+# References 
+
+* R Core Team (2022). R: A language and environment for statistical computing. R
+  Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
+* Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
+  4(43), 1686, https://doi.org/10.21105/joss.01686
+* Sam Firke (2021). janitor: Simple Tools for Examining and Cleaning Dirty Data. R
+  package version 2.1.0. https://CRAN.R-project.org/package=janitor
+* Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate.
+  Journal of Statistical Software, 40(3), 1-25. URL https://www.jstatsoft.org/v40/i03/.
+* Michael Hahsler, Christian Buchta, Bettina Gruen and Kurt Hornik (2022). arules: Mining
+  Association Rules and Frequent Itemsets. R package version 1.7-3.
+  https://CRAN.R-project.org/package=arules
+* Kun Ren and Kenton Russell (2021). formattable: Create 'Formattable' Data Structures. R
+  package version 0.2.1. https://CRAN.R-project.org/package=formattable
+* Aravind Hebbali (2020). rfm: Recency, Frequency and Monetary Value Analysis. R package
+  version 0.2.2. https://CRAN.R-project.org/package=rfm
+* Hernangómez D (2022). _mapSpain: Administrative Boundaries of Spain_. doi:
+10.5281/zenodo.5366622 (URL: https://doi.org/10.5281/zenodo.5366622), <URL:
+https://ropenspain.github.io/mapSpain/>.
+
+
 
