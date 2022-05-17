@@ -19,6 +19,7 @@ library (lubridate)
 library(arules)
 library(formattable)
 library(rfm)
+library("CLVTools")
 library(mapSpain)
 Sys.setenv(LANG = "sp")
 ```
@@ -216,6 +217,7 @@ prices <- prices %>%
 ```{r}
 # Merge orders and prices
 orders_prices <- merge(orders,prices,by="material")
+orders_prices <- filter(orders_prices, date > "2002-01-01")
 ```
 
 
@@ -507,6 +509,46 @@ rfm_plot_median_frequency(segments)
 ```
 
 
+#CLV
+
+```{r}
+orders_prices_clv <- filter(orders_prices, date >= '2018-01-01' & date <= '2021-06-01')
+
+orders_prices_clv <- orders_prices_clv %>%
+  group_by(customer) %>%
+  filter(!all(date > as.Date('2021-01-01'))) %>%
+  ungroup -> result
+
+clv.apparel <- clvdata(orders_prices_clv,
+  date.format = "ymd",
+  time.unit = "week",
+  estimation.split = 156,
+  name.id = "customer",
+  name.date = "date",
+  name.price = "revenue"
+)
+
+clv.apparel
+summary (clv.apparel)
+```
+
+### The Estimation Pareto 
+
+```{r}
+est.pnbd <- pnbd(clv.data = clv.apparel)
+est.pnbd
+plot(est.pnbd)
+```
+
+### The prediction for the holdout period
+```{r}
+pred_holdout <- predict(est.pnbd, predict.spending=TRUE)
+print(pred_holdout)
+print(pred_holdout)[1] 
+
+plot(est.pnbd, cumulative = FALSE)
+plot(est.pnbd, cumulative = TRUE)
+```
 
 
 # Association rule analysis
