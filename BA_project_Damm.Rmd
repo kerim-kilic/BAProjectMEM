@@ -289,8 +289,11 @@ retailers <- subset(retailers, !is.na(retailers$customer))
 
 ## Cleaning '/ES' values
 
+There are many retailers for which the field **Region** has a value of '/ES'. However, further inspection has shown that in many cases the same establishment has a determined region in another entry. This fact was used to replace the undetermined values '/ES' by a valid value in other entries.
+
+This was done by splitting the data frame in one part containing the values '/ES' in region and another with the rest. Then, the known regions were combined into the unknown by using 'id_establishment'. Finally, both data frames were combined by using **rbind** function.
+
 ```{r}
-# replacing ES/ values by those from entries where the region is known based on the id_establishment
 retailers_ES <- retailers %>% filter(region == "ES/")
 retailers_noES <- retailers %>% filter(region != "ES/")
 retailers_noES_unique <- retailers_noES %>% distinct(id_establishment, region)
@@ -301,10 +304,8 @@ mutate(region = region.y) %>% select(-region.y)
 
 retailers <- rbind(retailers_noES, retailers_ES)
 ```
-and '/'
+The method previously described worked for all the entries in which the value was '/ES'. Additionally, there were a few entries with value '/'. These were simply deleted from the data set.
 ```{r}
-#deleting remaining "/" values
-
 retailers <- retailers %>% filter(region != "/")
 ```
 
@@ -406,10 +407,15 @@ tab_4%>%head(15)%>%
 
 ## Geographical representation
 
-```{r}
+It was also considered of interest the geographical distribution of variables such as sales, expressed in terms of money and in volume.
 
+To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
+
+```{r}
 provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
 
+#necessary to modify the actual coordinates of the Canary island, because in our
+#they are depicted closer to the peninsula. 
 provinces$Latitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", 35.1, provinces$Latitud)
 provinces$Longitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", -10.5, provinces$Longitud)
 
@@ -423,7 +429,10 @@ retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVI
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
 orders_retailers_capitals <- orders_retailers_capitals %>% distinct(id_establishment,material, quantity, price, Capital, Latitud, Longitud, Habitantes)
+```
 
+Aggregated and per capital field were added to represent sales money and volume wise for the different provinces of Spain.
+```{r}
 #summary for map
 #adding revenue
 orders_retailers_capitals <- orders_retailers_capitals %>% mutate(Revenue = price * quantity)
@@ -434,7 +443,21 @@ Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>%
 
 Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Habitantes)
 Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Habitantes)
+```
 
+## Sales by volume
+
+```{r}
+ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume))
+
+ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume_per_capita))
+```
+
+## Sales by money
+
+```{r}
 Spain <- esp_get_prov()
 
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
@@ -442,18 +465,12 @@ ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
 
 ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita))
-
-ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume))
-
-ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume_per_capita))
-
 ```
 
 
-
 # RFM
+
+Given the historical data about retailers and transactions, it is possible to perform and analysis of Recency, Frequency and Money [spent]. To do this, a revenue column was added.
 
 ```{r}
 #add column revenue
