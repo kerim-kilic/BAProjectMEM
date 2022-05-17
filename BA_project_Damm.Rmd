@@ -287,6 +287,26 @@ There are only `r nrow(retailers[is.na(retailers$customer),])` customer values m
 retailers <- subset(retailers, !is.na(retailers$customer))
 ```
 
+## Cleaning '/ES' values
+
+```{r}
+# replacing ES/ values by those from entries where the region is known based on the id_establishment
+retailers_ES <- retailers %>% filter(region == "ES/")
+retailers_noES <- retailers %>% filter(region != "ES/")
+retailers_noES_unique <- retailers_noES %>% distinct(id_establishment, region)
+
+retailers_ES <- merge(retailers_ES, retailers_noES_unique, by = "id_establishment")
+retailers_ES <- retailers_ES %>% select(-region.x) %>%
+mutate(region = region.y) %>% select(-region.y)
+
+retailers <- rbind(retailers_noES, retailers_ES)
+```
+and '/'
+```{r}
+#deleting remaining "/" values
+
+retailers <- retailers %>% filter(region != "/")
+```
 
 
 # General overview of the data 
@@ -387,24 +407,14 @@ tab_4%>%head(15)%>%
 ## Geographical representation
 
 ```{r}
-#more cleaning: cleaning ES/ at region
-# replacing ES/ values by those from entries where the region is known based on the id_establishment
-retailers_ES <- retailers %>% filter(region == "ES/")
-retailers_noES <- retailers %>% filter(region != "ES/")
-retailers_noES_unique <- retailers_noES %>% distinct(id_establishment, region)
-
-retailers_ES <- merge(retailers_ES, retailers_noES_unique, by = "id_establishment")
-retailers_ES <- retailers_ES %>% select(-region.x) %>%
-  mutate(region = region.y) %>% select(-region.y)
-
-retailers <- rbind(retailers_noES, retailers_ES)
-
-#deleting remaining "ES/" and "/" values
-
-retailers <- retailers %>% filter(region != "ES/")
-retailers <- retailers %>% filter(region != "/")
 
 provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
+
+provinces$Latitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", 35.1, provinces$Latitud)
+provinces$Longitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", -10.5, provinces$Longitud)
+
+provinces$Latitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE", 35.5, provinces$Latitud)
+provinces$Longitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE", -11.3, provinces$Longitud)
 
 # Merge Retailers and Provinces
 retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
@@ -419,13 +429,25 @@ orders_retailers_capitals <- orders_retailers_capitals %>% distinct(id_establish
 orders_retailers_capitals <- orders_retailers_capitals %>% mutate(Revenue = price * quantity)
 
 Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>%
-  summarise(Sales = sum(Revenue), Habitantes = mean(Habitantes),
+  summarise(Sales = sum(Revenue), Volume = sum(quantity), Habitantes = mean(Habitantes),
             Longitude = mean(Longitud), Latitude = mean(Latitud))
+
+Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Habitantes)
+Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Habitantes)
 
 Spain <- esp_get_prov()
 
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales)) 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales))
+
+ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita))
+
+ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume))
+
+ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume_per_capita))
 
 ```
 
