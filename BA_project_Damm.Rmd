@@ -419,8 +419,10 @@ provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
 provinces$Latitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", 35.1, provinces$Latitud)
 provinces$Longitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", -10.5, provinces$Longitud)
 
-provinces$Latitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE", 35.5, provinces$Latitud)
-provinces$Longitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE", -11.3, provinces$Longitud)
+provinces$Latitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
+                            35.5, provinces$Latitud)
+provinces$Longitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
+                             -11.3, provinces$Longitud)
 
 # Merge Retailers and Provinces
 retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
@@ -428,16 +430,22 @@ retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVI
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
-orders_retailers_capitals <- orders_retailers_capitals %>% distinct(id_establishment,material, quantity, price, Capital, Latitud, Longitud, Habitantes)
+orders_retailers_capitals <- orders_retailers_capitals %>% distinct(
+  id_establishment,material, date ,quantity, price, Capital, Latitud, Longitud, Habitantes)
+
+#filter for year 2020
+orders_retailers_capitals_year <- orders_retailers_capitals %>%
+  filter(date >= "2020-01-01" & date <= "2020-12-31")
 ```
 
 Aggregated and per capital field were added to represent sales money and volume wise for the different provinces of Spain.
 ```{r}
 #summary for map
 #adding revenue
-orders_retailers_capitals <- orders_retailers_capitals %>% mutate(Revenue = price * quantity)
+orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
+  mutate(Revenue = price * quantity)
 
-Revenue_region <- orders_retailers_capitals %>% group_by(Capital) %>%
+Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
   summarise(Sales = sum(Revenue), Volume = sum(quantity), Habitantes = mean(Habitantes),
             Longitude = mean(Longitud), Latitude = mean(Latitud))
 
@@ -448,18 +456,19 @@ Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Habitan
 ## Sales by volume
 
 ```{r}
+Spain <- esp_get_prov()
+
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume))
 
 ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume_per_capita))
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude,
+                                        size = Volume_per_capita))
 ```
 
 ## Sales by money
 
 ```{r}
-Spain <- esp_get_prov()
-
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales))
 
