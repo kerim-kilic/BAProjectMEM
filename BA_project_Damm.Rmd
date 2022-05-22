@@ -555,7 +555,7 @@ Given the historical data about retailers and transactions, it is possible to pe
 
 ```{r}
 #add column revenue
-orders_prices <- orders_prices%>% mutate(revenue = quantity * price)
+orders_prices <- orders_prices%>% mutate(revenue = quantity * price_liter)
 
 ### ----create rfm score -------------------------------------------------------
 rfm_result <- rfm_table_order(orders_prices, customer, date, revenue, Sys.Date())
