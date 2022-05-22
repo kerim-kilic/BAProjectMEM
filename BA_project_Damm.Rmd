@@ -650,7 +650,7 @@ plot(est.pnbd, cumulative = TRUE)
 
 # Association rule analysis
 
-Preparing transaction matrix;
+The following code prepares the transaction matrix by creating a fictional transaction ID to link products that were bought on the same day by the same client. After this is done the matrix is created to use to mine all the relevant association rules.
 
 ```{r}
 ##################################
@@ -675,7 +675,8 @@ table <- new_data %>%
 
 matrix <- as(table %>% select(-transaction_id), "transactions")
 ```
-Mining the association rules with a support of at least 0.01, and a confidence of at least 0.8. There is slightly more than 10.000 transactions, this means that for the association rules mined the item combination occurs in at least around 100 transactions. And a confidence level of 0.8 means that in 80% of the cases this lead to the item on the right hand. With these confidence and suport settings 359 association rules are mined.
+
+Mining the association rules with a support of at least 0.01, and a confidence of at least 0.8. There is slightly more than 10.000 transactions, this means that for the association rules mined the item combination occurs in at least around 100 transactions. And a confidence level of 0.8 means that in 80% of the cases this lead to the item on the right hand. With these confidence and suport settings 359 association rules are mined. On the right hand side the most dominant product categories are Daura, Turia, Lemon, Free, and Estrella, which will be dived into deeper in the following sections.
 
 ```{r}
 ########################################
@@ -696,22 +697,191 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-Show top 25 of mined rules based on lift
+The following table shows the top 10 association rules based on lift. 
 
 ```{r}
-top_rules <- rules_df %>% head(25)
+top_rules <- rules_df %>% head(10)
 formattable(top_rules, 
             align =c("c","c","c","c"), 
             list(`Indicator Name` = formatter(
               "span", style = ~ style(color = "grey",font.weight = "bold"))))
 ```
 
-Plot the rules
+The following scatter plot shows the mined association rules with on the X-Axis the support, on the Y-Axis the confidence, and in the color grading the lift.
 
 ```{r}
 plot(rules_pruned, measure = c("support", "confidence"))
 ```
 
+## Daura product group relevant association rules
+
+Since Daura is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+
+```{r}
+##################################################
+### Mine and prune association rules for Daura ###
+##################################################
+rules <- apriori(matrix,
+                 control = list(verbose = FALSE),
+                 parameter = list(supp = 0.01, conf = 0.8),
+                 appearance = list(rhs = "DAURA")
+                 )
+
+quality(rules) <- round(quality(rules), digits=3) 
+rules <- sort(rules, by="lift")
+
+subset_matrix <- is.subset(rules,rules)
+subset_matrix[lower.tri(subset_matrix, diag = T)] <- FALSE
+redundant <- colSums(subset_matrix, na.rm = T) >= 1
+rules_pruned <- rules[!redundant]
+rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
+```
+
+The following table shows the top relevant association rules for the Daura product group. This means that any customer that buys the products in the left hand side is very likely to buy a Daura product.
+
+```{r}
+top_rules <- rules_df %>% head(10)
+formattable(top_rules, 
+            align =c("c","c","c","c"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold"))))
+```
+
+## Turia product group relevant association rules
+
+Since Turia is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+
+```{r}
+##################################################
+### Mine and prune association rules for Turia ###
+##################################################
+rules <- apriori(matrix,
+                 control = list(verbose = FALSE),
+                 parameter = list(supp = 0.01, conf = 0.8),
+                 appearance = list(rhs = "TURIA")
+                 )
+
+quality(rules) <- round(quality(rules), digits=3) 
+rules <- sort(rules, by="lift")
+
+subset_matrix <- is.subset(rules,rules)
+subset_matrix[lower.tri(subset_matrix, diag = T)] <- FALSE
+redundant <- colSums(subset_matrix, na.rm = T) >= 1
+rules_pruned <- rules[!redundant]
+rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
+```
+
+The following table shows the top relevant association rules for the Turia product group. This means that any customer that buys the products in the left hand side is very likely to buy a Turia product.
+
+```{r}
+top_rules <- rules_df %>% head(10)
+formattable(top_rules, 
+            align =c("c","c","c","c"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold"))))
+```
+
+## Lemon product group relevant association rules
+
+Since Lemon is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+
+```{r}
+##################################################
+### Mine and prune association rules for Lemon ###
+##################################################
+rules <- apriori(matrix,
+                 control = list(verbose = FALSE),
+                 parameter = list(supp = 0.01, conf = 0.8),
+                 appearance = list(rhs = "LEMON")
+                 )
+
+quality(rules) <- round(quality(rules), digits=3) 
+rules <- sort(rules, by="lift")
+
+subset_matrix <- is.subset(rules,rules)
+subset_matrix[lower.tri(subset_matrix, diag = T)] <- FALSE
+redundant <- colSums(subset_matrix, na.rm = T) >= 1
+rules_pruned <- rules[!redundant]
+rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
+```
+
+The following table shows the top relevant association rules for the Lemon product group. This means that any customer that buys the products in the left hand side is very likely to buy a Lemon product.
+
+```{r}
+top_rules <- rules_df %>% head(10)
+formattable(top_rules, 
+            align =c("c","c","c","c"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold"))))
+```
+
+## Free product group relevant association rules
+
+Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+
+```{r}
+##################################################
+### Mine and prune association rules for Free ####
+##################################################
+rules <- apriori(matrix,
+                 control = list(verbose = FALSE),
+                 parameter = list(supp = 0.01, conf = 0.8),
+                 appearance = list(rhs = "FREE")
+                 )
+
+quality(rules) <- round(quality(rules), digits=3) 
+rules <- sort(rules, by="lift")
+
+subset_matrix <- is.subset(rules,rules)
+subset_matrix[lower.tri(subset_matrix, diag = T)] <- FALSE
+redundant <- colSums(subset_matrix, na.rm = T) >= 1
+rules_pruned <- rules[!redundant]
+rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
+```
+
+The following table shows the top relevant association rules for the Free product group. This means that any customer that buys the products in the left hand side is very likely to buy a Free product.
+
+```{r}
+top_rules <- rules_df %>% head(10)
+formattable(top_rules, 
+            align =c("c","c","c","c"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold"))))
+```
+
+## Estrella product group relevant association rules
+
+Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+
+```{r}
+######################################################
+### Mine and prune association rules for Estrella ####
+######################################################
+rules <- apriori(matrix,
+                 control = list(verbose = FALSE),
+                 parameter = list(supp = 0.01, conf = 0.8),
+                 appearance = list(rhs = "ESTRELLA")
+                 )
+
+quality(rules) <- round(quality(rules), digits=3) 
+rules <- sort(rules, by="lift")
+
+subset_matrix <- is.subset(rules,rules)
+subset_matrix[lower.tri(subset_matrix, diag = T)] <- FALSE
+redundant <- colSums(subset_matrix, na.rm = T) >= 1
+rules_pruned <- rules[!redundant]
+rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
+```
+
+The following table shows the top relevant association rules for the Estrella product group. This means that any customer that buys the products in the left hand side is very likely to buy a Estrella product.
+
+```{r}
+top_rules <- rules_df %>% head(10)
+formattable(top_rules, 
+            align =c("c","c","c","c"), 
+            list(`Indicator Name` = formatter(
+              "span", style = ~ style(color = "grey",font.weight = "bold"))))
+```
 
 # Conclusions 
 
