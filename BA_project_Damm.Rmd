@@ -73,7 +73,8 @@ Translating the variable names to English
 colnames(retailers) <- c("X", "id_retailer", "id_establishment", "country", 
                          "distributor", "region", "area", "category","type", 
                          "type2", "customer")
-colnames(prices) <- c("material","price")
+colnames(prices) <- c("material","price","volume_minor_unit","quantity_minor_units",
+                      "volume_unit", "price_liter")
 colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", 
                       "measure_unit", "quantity")
 ```
@@ -337,7 +338,7 @@ Orders over years
 orders$Year <- as.Date(cut(orders$date,
                             breaks = "year"))
 
-#I want to add colour per product type, I am not able 
+#I want to add color per product type, I am not able 
 
 orders %>% group_by(Year) %>% 
   summarise(count = n()) %>% ggplot(aes(Year, count)) + geom_line() +
@@ -441,7 +442,7 @@ retailers_capitals <- merge(retailers, provinces_communities, by.x = "region", b
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
 orders_retailers_capitals <- orders_retailers_capitals %>% distinct(
-  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude, Autonomous_community ,Population_community,Population, Beer_consumption)
+  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude, Autonomous_community ,Population_community,Population, price_liter, Beer_consumption)
 
 #filter for year 2020
 orders_retailers_capitals_year <- orders_retailers_capitals %>%
@@ -453,7 +454,7 @@ Aggregated and per capital field were added to represent sales money and volume 
 #summary for map
 #adding revenue
 orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
-  mutate(Revenue = price * quantity)
+  mutate(Revenue = price_liter * quantity)
 
 Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
   summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community),
@@ -495,7 +496,7 @@ Revenue_Autonomous_community <- orders_retailers_capitals_year %>%
             Longitude = mean(Longitude), Latitude = mean(Latitude))
 
 Revenue_Autonomous_community <- Revenue_Autonomous_community %>%
-  mutate(Sales_per_capita = Sales / Population_community, Volume_per_capita = Volume / Population_community)
+  mutate(Sales_per_capita = Sales / Population_community, Volume_per_capita = Volume / Population_community, Damm_market_percentage = Sales_per_capita/Beer_consumption_per_capita)
 
 Spain_ccaa <- esp_get_ccaa()
 
@@ -503,6 +504,9 @@ ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
                                             aes(x = Longitude, y = Latitude, size = Volume_per_capita))
 ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
                                             aes(x = Longitude, y = Latitude, size = Beer_consumption_per_capita))
+
+ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
+                                            aes(x = Longitude, y = Latitude, size = Damm_market_percentage))
 ```
 
 
