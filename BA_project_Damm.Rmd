@@ -28,9 +28,9 @@ Sys.setenv(LANG = "sp")
 
 This documents aims to  help the company DDI to develop a good commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
 
-# Setup the software
+# Software Setup
 
-The software used for the development of the study and the writing of the report is R[1]. The first step is to define the work directory and to load the libraries: 
+The software used for the development of the study and the writing of the report is. The first step is to define the work directory and to load the libraries: 
 
 * library(tidyverse)
 * library(janitor)
@@ -49,16 +49,8 @@ The data used in this report is the one provided by DDI. This data is located in
 * t_material_Freqs
 * t_posiciones
 
-The table t_datallista, from now on referred as retailers. 
 
-In addition, the table material_preu_damm, now referred as prices. 
-
-Then, there is the table t_material_Freqs, now called quantity.  
-
-Lastly, there is the table t_posiciones, now called orders. 
-
-Reading in the data from the four tables. 
-[Describe each table and their corresponding variables.]
+Now, the data will be retreived from the four tables just mentioned. 
 
 ```{r, echo = FALSE, message = FALSE}
 retailers <- read.csv("data/t_detallista.csv", encoding = 'UTF-8')
@@ -67,14 +59,23 @@ quantity <- read.csv("data/t_material_Freqs.csv", encoding = 'UTF-8')
 orders <- read.csv("data/t_posiciones.csv", encoding = 'UTF-8')
 ```
 
-Translating the variable names to English
+[Describe each table and their corresponding variables.]
+
+The table t_datallista, from now on referred as retailers. This data refers to XXX. 
+
+In addition, the table material_preu_damm, now referred as prices. This data includes XXX. 
+
+Then, there is the table t_material_Freqs, now called quantity. This data refers to XXX.  
+
+Lastly, there is the table t_posiciones, now called orders. This data includes information about the orders placed by each establishment. It includes the ID of the establishment, the date the order was placed, as well as which material was ordered, in which unit of measure and its quantity. 
+
+The data had some variable names in Spanish. Now, these are translated to English for a better understanding. 
 
 ```{r}
 colnames(retailers) <- c("X", "id_retailer", "id_establishment", "country", 
                          "distributor", "region", "area", "category","type", 
                          "type2", "customer")
-colnames(prices) <- c("material","price","volume_minor_unit","quantity_minor_units",
-                      "volume_unit", "price_liter")
+colnames(prices) <- c("material","price")
 colnames(orders) <- c("X", "id_establishment", "date", "material", "customer", 
                       "measure_unit", "quantity")
 ```
@@ -103,37 +104,34 @@ clean_data <- function(dataset)
 
 Now, the table Orders will be cleaned. 
 
-Run the clean_data() function to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
+First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 
 ```{r}
 orders <- clean_data(orders) %>% select(-x)
 ```
 
-### "id_establiment" variable  
+The "id_establiment" variable  
 ```{r}
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
+There are NA's values, which must be removed. The other values seem to be correct. 
+```{r}
+orders <- orders %>% filter(!is.na(id_establishment))
+```
 
-<!-- We delete the NA values -->
-<!-- ```{r} -->
-<!-- orders <- orders %>% filter(!is.na(id_establishment)) -->
-<!-- ``` -->
-
-### "Date" variable
+The "Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
 ```
 
-We look at the first dates and last dates
+Looking at the first dates and last dates
 ```{r}
 orders$date %>% head(20)
 orders$date %>% tail(20)
 ```
 
-We assume that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019 
-
-<!-- This code needs to be optimized on runtime -->
+It is assumed that 0202 should be 2002, that 2218 is 2018, that 2202 is 2022 and that 2119 is 2019. 
 
 ```{r}
 orders$date <- ifelse(orders$date == "0202-03-01", "2002-03-01", as.character(orders$date))
@@ -145,24 +143,28 @@ orders$date <- ifelse(orders$date == "2022-07-14", "2021-07-14", as.character(or
 orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
-### "Customer" variable
+The "Customer" variable
 
-We delete the NA's
 ```{r}
 orders %>% tabyl(customer) %>% select (customer) %>% summary()
+```
+
+The NA's are deleted. The other values seem to be correct. 
+```{r}
 orders <- orders %>% filter (!is.na(customer))
 ```
 
 
-### "Unit" variable
+The "Unit" variable
 ```{r}
 orders %>% tabyl(measure_unit)
 empty_unit <- nrow(orders %>% filter(is.na(measure_unit)))
 empty_unit
 ```
-there are `r empty_unit` with no unit of measure
 
-### "quantity" variable
+There are `r empty_unit` with no unit of measure
+
+The "quantity" variable
 ```{r}
 orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```
@@ -170,27 +172,50 @@ orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```{r}
 zero_quantity <- nrow(orders[orders$quantity == 0,])
 ```
+
 There are `r zero_quantity` with zero quantity
 
-Delete those rows with a 0 in quantity 
+Those rows with a 0 in quantity are deleted. 
 ```{r}
 orders <- orders %>% filter(quantity != 0)
 ```
 
-## Cleaning Quantity Data
-Remove the X variable and check na values per column
+## Cleaning Data "Quantity"
+In this section, the table quantity will be cleaned. First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 ```{r}
 quantity <- clean_data(quantity) %>% select(-x)
 which(colSums(is.na(quantity)) > 0)
 ```
-Remove the na values of the material column
+
+The NA's values of the material column are removed. 
 ```{r}
 quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
-## Adding the type of product
+### Adding the type of product
+
+It was seen that the products could be grouped by product type. This agrupation is shown now. 
+The product types are: 
+
+* AK
+* BOCK
+* COMPLOT
+* LEMON
+* ESTRELLA
+* FREE
+* INEDIT
+* SAAZ
+* TURIA
+* VOLL
+* WEISS
+* XIBECA
+* GENERAL
+* GRUPO DAMM
+* DAURA
+* DAMM
+* EQUILATER
 
 ```{r}
 prices <- prices %>%
@@ -215,6 +240,8 @@ prices <- prices %>%
 
 ## Merging orders and prices
 
+In order to perform the analysis, the tables orders and prices should be merged. This is done using the merge function, and doing it by the "material" variable. In order to have relevant data, this data is filter from 2002 on wards. 
+
 ```{r}
 # Merge orders and prices
 orders_prices <- merge(orders,prices,by="material")
@@ -222,37 +249,39 @@ orders_prices <- filter(orders_prices, date > "2002-01-01")
 ```
 
 
-## Cleaning up the data of Retailers
+## Cleaning Data "Retailers"
+
+In this section, the table retailers will be cleaned. First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 ```{r}
 retailers <- clean_data(retailers) %>% select(-x)
 ```
 
-Now, let's check which columns/variables have missing data
+Now, it is checked which columns/variables have missing data
 ```{r}
 which(colSums(is.na(retailers)) > 0)
 ```
 
-Let's take a look at the types of the restaurants
+Looking at the types of the restaurants
 ```{r}
 nrow(retailers[is.na(retailers$type),])
 nrow(retailers[is.na(retailers$type2),])
 ```
 
-We see that there are `r nrow(retailers[is.na(retailers$type),])` entries out of `r nrow(retailers)` total that are missing the type of the restaurant, and only `r nrow(retailers[is.na(retailers$type2),])` that are missing 'type2'. Thus, we will treat "type2" as the general type of the restaurant, and in case missing, will replace it with "type" and in case both are missing, will consider deleting that entry.
+It can be seen that there are `r nrow(retailers[is.na(retailers$type),])` entries out of `r nrow(retailers)` total that are missing the type of the restaurant, and only `r nrow(retailers[is.na(retailers$type2),])` that are missing 'type2'. Thus,  "type2" will be treated as the general type of the restaurant, and in case missing, it will be replaced with "type" and in case both are missing, it will be considered deleting that entry.
 
 ```{r echo=FALSE, include = FALSE}
 ifelse(!is.na(retailers$type2), retailers$type <- retailers$type2, retailers$type )
 retailers$type2 <- NULL
 ```
 
-Now, let's take a look at the other missing variables
+Now, the other missing variables are checked. 
 ```{r}
 which(colSums(is.na(retailers)) > 0)
 retailers[is.na(retailers$country),]
 ```
 
-For country, the last two missing entries are clearly in Spain, the first one has already other missing variables as well, so we will just delete it.
+For country, the last two missing entries are clearly in Spain, the first one has already other missing variables as well, so it will be delete it.
 
 ```{r}
 retailers[retailers$id_retailer == '9100245153',]$country <- 'España'
@@ -260,14 +289,14 @@ retailers[retailers$id_retailer == '9100366860',]$country <- 'España'
 retailers <- subset(retailers, retailers$id_retailer != '9100399677')
 ```
 
-Now, let's take a look at the area and region
+Now, the area and region are studied. 
 ```{r}
 nrow(retailers[is.na(retailers$area),])
 nrow(retailers[is.na(retailers$region),])
 retailers[is.na(retailers$region),]
 ```
 
-We see that we have only `r nrow(retailers[is.na(retailers$region),])` missing region variable and `r nrow(retailers[is.na(retailers$area),])` area entries. Furthermore, within the scope of our analysis we won't be looking through the specific areas within the cities or regions, and so the *area* variable is redundant and can be removed at all.
+It is seen that there are only `r nrow(retailers[is.na(retailers$region),])` missing region variable and `r nrow(retailers[is.na(retailers$area),])` area entries. Furthermore, within the scope of this analysis it won't be looked through the specific areas within the cities or regions, and so the *area* variable is redundant and can be removed at all.
 
 ```{r}
 retailers$area <- NULL
@@ -275,7 +304,8 @@ retailers <- subset(retailers, !is.na(retailers$region))
 tabyl(retailers$region)
 ```
 
-Looking through the category data we see a lot of NA values, and after checking with the company, we realized that they are not classified yet. Thus, we will mark them so for now and classify them afterwards as part of our work. 
+Looking through the category data a lot of NA values can be seen, and after checking with the company, it was realized that they are not classified yet. Thus, the will be marked so for now and classify them afterwards as part of the work. 
+
 ```{r}
 tabyl(retailers$category)
 retailers$category <- ifelse(is.na(retailers$category), "Non_classified", retailers$category)
@@ -284,7 +314,7 @@ retailers$category <- ifelse(is.na(retailers$category), "Non_classified", retail
 
 Last up is the customer values.
 
-There are only `r nrow(retailers[is.na(retailers$customer),])` customer values missing. Since we might need clean customer values for later merging with orders table, we will just remove the rows with NAs, as it will not affect our data anyhow.
+There are only `r nrow(retailers[is.na(retailers$customer),])` customer values missing. Since it might be needed clean customer values for later merging with orders table, it will just be removed the rows with NAs, as it will not affect the data anyhow.
 
 ```{r}
 retailers <- subset(retailers, !is.na(retailers$customer))
@@ -315,7 +345,12 @@ retailers <- retailers %>% filter(region != "/")
 
 # General overview of the data 
 
-Counting the number of times a type of article appears in an order. 
+In this section of the report, a general overview of the data will be shown using graphs. First, the evolution of order lines over years and month. Then, the top clients will be observed. Following, the most popular client locations will be analysed, as well as the preferred product type. 
+
+As some orders include several order lines, and some only one, this analysis will be done regarding order lines. 
+
+## Oreder lines per product type
+First, the  number of times a type of article appears in an order is counted, and from this, a graph taking into account the percentage is made.  
 
 ```{r}
 orders_prices %>%
@@ -326,27 +361,28 @@ orders_prices %>%
   geom_text(aes(label=percentage), hjust=-0.01)+
   geom_bar(stat="identity", position = "dodge") + 
   coord_flip() + 
-  labs(title= "% of orders per product type", y = "% of Orders", x = "Type of prodcut ") +  
+  labs(title= "% of Orders per Product Type", y = "% of Order lines", x = "Type of prodcut") +  
   theme(legend.position = "none")
 ```
 
-Order lines over time. We use order lines instead of orders, because there can be orders with just one line, and orders with a lot of lines, and they are not comparable. 
+It can be seen that the most popular product type is Estrella, followed by Free. In the last positions there are Xibeca and Equilated. 
 
-Orders over years 
+## Oreder lines over the years 
+
+Now, an evolution of the order lines over the years will be shown. The data is filtered from 2015 to 2022 in order to have relevant information. 
 
 ```{r}
 orders$Year <- as.Date(cut(orders$date,
                             breaks = "year"))
 
-#I want to add color per product type, I am not able 
-
-orders %>% group_by(Year) %>% 
+orders %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Year) %>% 
   summarise(count = n()) %>% ggplot(aes(Year, count)) + geom_line() +
   geom_point()  + 
-  labs(title= "Orders over years", y = " Order lines", x = "Year ")
+  labs(title= "Order Lines over Years", y = " Order lines", x = "Year ") + theme_minimal()
 ```
 
-Orders over months
+## Oreder lines over the years  
+Now, an evolution of the order lines over the months in several years will be shown. The data is filtered from January 2018 to Mat 2021. 
 ```{r}
 
 orders$Month <- as.Date(cut(orders$date,
@@ -361,10 +397,13 @@ a1%>%ggplot(aes(Month, count)) + geom_line() +
   geom_point()+
   geom_label(data = a1 %>% filter(month(Month) == 1), aes(label=count))+
   geom_vline(xintercept = as.numeric(as.Date("2020-03-15")), linetype=5, colour="red")+
-  labs(title= "Orders over months", y = " Order lines", x = "Month ") 
+  labs(title= "Order Lines over Months", y = " Order lines", x = "Month ") + theme_minimal()
 ```
+It can be seen that the peaks are located in the month of January of every year The red line shows the moment COVID-19 pandemic restrictions started in Spain. A clear decline in order lines can be seen after this. The peak in 2021 is much lower than the previous ones. 
 
-Top clients 
+
+##Top clients 
+Now, the clients with more order lines will be shown in a table. 
 ```{r}
 tab_1 <- orders_prices %>%
   group_by(id_establishment)%>%
@@ -372,25 +411,21 @@ tab_1 <- orders_prices %>%
 
 tab_2 <- tab_1[order(-tab_1$count),]
 
-tab_2 %>% head(15)%>%
-  ggplot(aes(reorder(id_establishment, count), count, fill=id_establishment))+
-  geom_bar(stat="identity", position = "dodge") + 
-  coord_flip() + 
-  labs(title= "Order lines per client", y = " Order lines", x = "Client ") +  
-  theme(legend.position = "none")
+tab_2 %>% head(10)
 ```
 
-clients with only 1 order line 
+Also, the clients with only 1 order line will be studdied. 
 
 ```{r}
 one_order_line <- tab_2 %>% filter(count == 1) %>% nrow()
 ```
 There are `r one_order_line` clients with only 1 order line. 
 
-Retailers per location
+## Retailers per location
+
+It is interesting to study where the most order lines come from in terms of location. This will be analysed now. 
 
 ```{r}
-
 tab_3 <- retailers %>%
   group_by(region)%>%
   summarise(count = n()) %>%
@@ -407,42 +442,34 @@ tab_4%>%head(15)%>%
   theme(legend.position = "none")
 
 ```
+It can be seen that more than 30% of the order lines come from Barcelona, whereas less than 2% come from Vizcaya. 
 
 ## Geographical representation
-
 It was also considered of interest the geographical distribution of variables such as sales, expressed in terms of money and in volume.
 
 To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
 
 ```{r}
-#retrieving info about communities and provinces
 provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
-autonomous_com <- read.csv("data/community_population.csv")
 
-provinces$Province <- str_to_title(provinces$Province)
-retailers$region <- str_to_title(retailers$region)
+#necessary to modify the actual coordinates of the Canary island, because in our
+#they are depicted closer to the peninsula. 
+provinces$Latitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", 35.1, provinces$Latitud)
+provinces$Longitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", -10.5, provinces$Longitud)
 
-#necessary to modify the actual coordinates of the Canary island, because in our map
-#they are depicted closer to the peninsula.
-provinces$Latitude <- ifelse(provinces$Province == "Las Palmas", 35.1, provinces$Latitude)
-provinces$Longitude <- ifelse(provinces$Province == "Las Palmas", -10.5, provinces$Longitude)
-
-provinces$Latitude <- ifelse(provinces$Province == "Sta Cruz De Tenerife",
-                            35.5, provinces$Latitude)
-provinces$Longitude <- ifelse(provinces$Province == "Sta Cruz De Tenerife",
-                             -11.3, provinces$Longitude)
-
-#Merge Provinces and communities
-provinces_communities <- merge(provinces, autonomous_com, by = "Autonomous_community")
+provinces$Latitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
+                            35.5, provinces$Latitud)
+provinces$Longitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
+                             -11.3, provinces$Longitud)
 
 # Merge Retailers and Provinces
-retailers_capitals <- merge(retailers, provinces_communities, by.x = "region", by.y = "Province")
+retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
 
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
 orders_retailers_capitals <- orders_retailers_capitals %>% distinct(
-  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude, Autonomous_community ,Population_community,Population, price_liter, Beer_consumption)
+  id_establishment,material, date ,quantity, price, Capital, Latitud, Longitud, Habitantes)
 
 #filter for year 2020
 orders_retailers_capitals_year <- orders_retailers_capitals %>%
@@ -454,17 +481,17 @@ Aggregated and per capital field were added to represent sales money and volume 
 #summary for map
 #adding revenue
 orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
-  mutate(Revenue = price_liter * quantity)
+  mutate(Revenue = price * quantity)
 
 Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
-  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community),
-            Longitude = mean(Longitude), Latitude = mean(Latitude))
+  summarise(Sales = sum(Revenue), Volume = sum(quantity), Habitantes = mean(Habitantes),
+            Longitude = mean(Longitud), Latitude = mean(Latitud))
 
-Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Population_community)
-Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Population_community)
+Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Habitantes)
+Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Habitantes)
 ```
 
-## Sales by volume
+### Sales by volume
 
 ```{r}
 Spain <- esp_get_prov()
@@ -477,7 +504,7 @@ ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") +
                                         size = Volume_per_capita))
 ```
 
-## Sales by money
+### Sales by money
 
 ```{r}
 ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
@@ -485,28 +512,6 @@ ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
 
 ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita))
-```
-# Consumption-Sales Autonomous Community
-
-```{r}
-#Summary autonomous community
-Revenue_Autonomous_community <- orders_retailers_capitals_year %>%
-  group_by(Autonomous_community) %>% 
-  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community), Beer_consumption_per_capita = mean(Beer_consumption),
-            Longitude = mean(Longitude), Latitude = mean(Latitude))
-
-Revenue_Autonomous_community <- Revenue_Autonomous_community %>%
-  mutate(Sales_per_capita = Sales / Population_community, Volume_per_capita = Volume / Population_community, Damm_market_percentage = Sales_per_capita/Beer_consumption_per_capita)
-
-Spain_ccaa <- esp_get_ccaa()
-
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Volume_per_capita))
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Beer_consumption_per_capita))
-
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Damm_market_percentage))
 ```
 
 
@@ -649,6 +654,9 @@ formattable(rules_df,
               "span", style = ~ style(color = "grey",font.weight = "bold"))))
 ```
 
+# Conclusions 
+
+ 
 
 # References 
 
