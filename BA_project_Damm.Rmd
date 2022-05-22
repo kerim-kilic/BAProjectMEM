@@ -414,26 +414,34 @@ It was also considered of interest the geographical distribution of variables su
 To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
 
 ```{r}
+#retrieving info about communities and provinces
 provinces <- read.csv("data/capitals-locations.csv", fileEncoding = 'UTF-8-BOM')
+autonomous_com <- read.csv("data/community_population.csv")
 
-#necessary to modify the actual coordinates of the Canary island, because in our
-#they are depicted closer to the peninsula. 
-provinces$Latitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", 35.1, provinces$Latitud)
-provinces$Longitud <- ifelse(provinces$PROVINCIA == "LAS PALMAS", -10.5, provinces$Longitud)
+provinces$Province <- str_to_title(provinces$Province)
+retailers$region <- str_to_title(retailers$region)
 
-provinces$Latitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
-                            35.5, provinces$Latitud)
-provinces$Longitud <- ifelse(provinces$PROVINCIA == "STA CRUZ DE TENERIFE",
-                             -11.3, provinces$Longitud)
+#necessary to modify the actual coordinates of the Canary island, because in our map
+#they are depicted closer to the peninsula.
+provinces$Latitude <- ifelse(provinces$Province == "Las Palmas", 35.1, provinces$Latitude)
+provinces$Longitude <- ifelse(provinces$Province == "Las Palmas", -10.5, provinces$Longitude)
+
+provinces$Latitude <- ifelse(provinces$Province == "Sta Cruz De Tenerife",
+                            35.5, provinces$Latitude)
+provinces$Longitude <- ifelse(provinces$Province == "Sta Cruz De Tenerife",
+                             -11.3, provinces$Longitude)
+
+#Merge Provinces and communities
+provinces_communities <- merge(provinces, autonomous_com, by = "Autonomous_community")
 
 # Merge Retailers and Provinces
-retailers_capitals <- merge(retailers, provinces, by.x = "region", by.y = "PROVINCIA")
+retailers_capitals <- merge(retailers, provinces_communities, by.x = "region", by.y = "Province")
 
 # Merge Orders, Retailers and Provinces
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
 orders_retailers_capitals <- orders_retailers_capitals %>% distinct(
-  id_establishment,material, date ,quantity, price, Capital, Latitud, Longitud, Habitantes)
+  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude, Autonomous_community ,Population_community,Population, Beer_consumption)
 
 #filter for year 2020
 orders_retailers_capitals_year <- orders_retailers_capitals %>%
@@ -448,11 +456,11 @@ orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
   mutate(Revenue = price * quantity)
 
 Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
-  summarise(Sales = sum(Revenue), Volume = sum(quantity), Habitantes = mean(Habitantes),
-            Longitude = mean(Longitud), Latitude = mean(Latitud))
+  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community),
+            Longitude = mean(Longitude), Latitude = mean(Latitude))
 
-Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Habitantes)
-Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Habitantes)
+Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Population_community)
+Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Population_community)
 ```
 
 ## Sales by volume
@@ -476,6 +484,25 @@ ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
 
 ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita))
+```
+# Consumption-Sales Autonomous Community
+
+```{r}
+#Summary autonomous community
+Revenue_Autonomous_community <- orders_retailers_capitals_year %>%
+  group_by(Autonomous_community) %>% 
+  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community), Beer_consumption_per_capita = mean(Beer_consumption),
+            Longitude = mean(Longitude), Latitude = mean(Latitude))
+
+Revenue_Autonomous_community <- Revenue_Autonomous_community %>%
+  mutate(Sales_per_capita = Sales / Population_community, Volume_per_capita = Volume / Population_community)
+
+Spain_ccaa <- esp_get_ccaa()
+
+ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
+                                            aes(x = Longitude, y = Latitude, size = Volume_per_capita))
+ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
+                                            aes(x = Longitude, y = Latitude, size = Beer_consumption_per_capita))
 ```
 
 
