@@ -21,6 +21,7 @@ library(formattable)
 library(rfm)
 library("CLVTools")
 library(mapSpain)
+library(arulesViz)
 Sys.setenv(LANG = "sp")
 ```
 
