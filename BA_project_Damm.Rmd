@@ -28,7 +28,7 @@ Sys.setenv(LANG = "sp")
 
 This documents aims to  help the company DDI to develop a good commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
 
-# Setup the software
+# Software Setup
 
 The software used for the development of the study and the writing of the report is. The first step is to define the work directory and to load the libraries: 
 
@@ -67,7 +67,7 @@ In addition, the table material_preu_damm, now referred as prices. This data inc
 
 Then, there is the table t_material_Freqs, now called quantity. This data refers to XXX.  
 
-Lastly, there is the table t_posiciones, now called orders. This data includes XXX.
+Lastly, there is the table t_posiciones, now called orders. This data includes information about the orders placed by each establishment. It includes the ID of the establishment, the date the order was placed, as well as which material was ordered, in which unit of measure and its quantity. 
 
 The data had some variable names in Spanish. Now, these are translated to English for a better understanding. 
 
@@ -111,7 +111,7 @@ First,  the clean_data() function is run to clean the names of the variables, re
 orders <- clean_data(orders) %>% select(-x)
 ```
 
-### "id_establiment" variable  
+The "id_establiment" variable  
 ```{r}
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
@@ -120,7 +120,7 @@ There are NA's values, which must be removed. The other values seem to be correc
 orders <- orders %>% filter(!is.na(id_establishment))
 ```
 
-### "Date" variable
+The "Date" variable
 ```{r}
 orders <- orders %>% mutate(date =as.Date(date, format = "%d.%m.%Y"))
 ```
@@ -143,7 +143,7 @@ orders$date <- ifelse(orders$date == "2022-07-14", "2021-07-14", as.character(or
 orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
-### "Customer" variable
+The "Customer" variable
 
 ```{r}
 orders %>% tabyl(customer) %>% select (customer) %>% summary()
@@ -155,7 +155,7 @@ orders <- orders %>% filter (!is.na(customer))
 ```
 
 
-### "Unit" variable
+The "Unit" variable
 ```{r}
 orders %>% tabyl(measure_unit)
 empty_unit <- nrow(orders %>% filter(is.na(measure_unit)))
@@ -164,7 +164,7 @@ empty_unit
 
 There are `r empty_unit` with no unit of measure
 
-### "quantity" variable
+The "quantity" variable
 ```{r}
 orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```
@@ -180,7 +180,7 @@ Those rows with a 0 in quantity are deleted.
 orders <- orders %>% filter(quantity != 0)
 ```
 
-## Cleaning Quantity Data
+## Cleaning Data "Quantity"
 In this section, the table quantity will be cleaned. First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 ```{r}
@@ -194,7 +194,7 @@ quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
-## Adding the type of product
+### Adding the type of product
 
 It was seen that the products could be grouped by product type. This agrupation is shown now. 
 The product types are: 
@@ -249,7 +249,7 @@ orders_prices <- filter(orders_prices, date > "2002-01-01")
 ```
 
 
-## Cleaning up the data of Retailers
+## Cleaning Data "Retailers"
 
 In this section, the table retailers will be cleaned. First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
@@ -654,6 +654,9 @@ formattable(rules_df,
               "span", style = ~ style(color = "grey",font.weight = "bold"))))
 ```
 
+# Conclusions 
+
+ 
 
 # References 
 
