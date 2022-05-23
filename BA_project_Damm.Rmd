@@ -904,9 +904,13 @@ formattable(top_rules,
   package version 0.2.1. https://CRAN.R-project.org/package=formattable
 * Aravind Hebbali (2020). rfm: Recency, Frequency and Monetary Value Analysis. R package
   version 0.2.2. https://CRAN.R-project.org/package=rfm
+* Patrick Bachmann, Niels Kuebler, Markus Meierer, Jeffrey Naef, Elliot Oblander and
+  Patrik Schilter (2022). CLVTools: Tools for Customer Lifetime Value Estimation. R
+  package version 0.9.0. https://CRAN.R-project.org/package=CLVTools
 * Hernangómez D (2022). _mapSpain: Administrative Boundaries of Spain_. doi:
 10.5281/zenodo.5366622 (URL: https://doi.org/10.5281/zenodo.5366622), <URL:
 https://ropenspain.github.io/mapSpain/>.
+
 
 
 
