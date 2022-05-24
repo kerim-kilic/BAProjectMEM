@@ -542,6 +542,7 @@ grid.arrange(map_vol_1, map_vol_2, ncol = 2)
 ```
 Barcelona is by far the province in which the biggest volume of Damm products are sold,
 with more than **24** millions of liters. In Tarragona, Madrid and Palma around half a million of liters are distributed.
+Now, when comparing the amount sold with the population other facts can be noticed. In this case, Tarragona has the highest consumption per capita a year, with almost 7 liters. Barcelona, Gerona, Logroño and Palma also have remarkable consumption of Damm products with around 4 liters.
 
 ### Sales by money
 
