@@ -512,18 +512,23 @@ Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Populat
 Spain <- esp_get_prov()
 
 map_vol_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume), color = "#256F72") +
-  theme(legend.title =  element_text(size = 7, ),
-        legend.text = element_text(size = 5),
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume), color = "#124C6F") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
         legend.position = "bottom",
     panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
   scale_size_continuous(name = "Total Volume")
 
 map_vol_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") + 
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude,
-                                        size = Volume_per_capita))  +
-  theme(legend.title =  element_text(size = 7, ),
-        legend.text = element_text(size = 5),
+                                        size = Volume_per_capita),
+             color = "#124C6F") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
         legend.position = "bottom",
     panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
   scale_size_continuous(name = "Volume per capita")
@@ -534,11 +539,28 @@ grid.arrange(map_vol_1, map_vol_2, ncol = 2)
 ### Sales by money
 
 ```{r}
-ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales))
+map_sales_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales),
+             color = "#124C6F") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "bottom",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Total Sales")
 
-ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita))
+map_sales_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") + 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita), color = "#124C6F") + 
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "bottom",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Sales per capita")
+
+grid.arrange(map_sales_1, map_sales_2, ncol = 2)
 ```
 
 # Consumption-Sales Autonomous Community
