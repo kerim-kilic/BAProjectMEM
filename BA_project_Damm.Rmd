@@ -448,7 +448,7 @@ tab_4%>%head(15)%>%
 It can be seen that more than 30% of the order lines come from Barcelona, whereas less than 2% come from Vizcaya. 
 
 ## Geographical representation
-It was also considered of interest the geographical distribution of variables such as sales, expressed in terms of money and in volume.
+It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and in volume.
 
 To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
 
@@ -499,20 +499,25 @@ orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
 
 Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
   summarise(Sales = sum(Revenue), Volume = sum(quantity),
-            Population_community = mean(Population_community),
+            Population_province = mean(Population),
             Longitude = mean(Longitude), Latitude = mean(Latitude))
 
-Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Population_community)
-Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Population_community)
+Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Population_province)
+Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Population_province)
 ```
 
 ### Sales by volume
+
+After preparing the data for Spain, two plots were prepared to represent 
+the sales of Damm for every province. The map on the left represent the amount of
+liters sold in *2020*. Additionally, in order to consider the effect of the population,on the right it is possible to see the representation of the average consumption of beer Damm in the same year. 
 
 ```{r, fig.align='center', out.width='100%'}
 Spain <- esp_get_prov()
 
 map_vol_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume), color = "#124C6F") +
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume),
+             color = "#124C6F") +
   theme(axis.title.x = element_text(size = 10),
         axis.title.y = element_text(size = 10),
         legend.title =  element_text(size = 8),
@@ -535,10 +540,12 @@ map_vol_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
 
 grid.arrange(map_vol_1, map_vol_2, ncol = 2)
 ```
+Barcelona is by far the province in which the biggest volume of Damm products are sold,
+with more than **24** millions of liters. In Tarragona, Madrid and Palma around half a million of liters are distributed.
 
 ### Sales by money
 
-```{r}
+```{r, fig.align='center', out.width='100%'}
 map_sales_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Sales),
              color = "#124C6F") +
@@ -551,7 +558,8 @@ map_sales_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
   scale_size_continuous(name = "Total Sales")
 
 map_sales_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") + 
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = sales_per_capita), color = "#124C6F") + 
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude,
+                                        size = sales_per_capita), color = "#124C6F") + 
   theme(axis.title.x = element_text(size = 10),
         axis.title.y = element_text(size = 10),
         legend.title =  element_text(size = 8),
@@ -565,26 +573,59 @@ grid.arrange(map_sales_1, map_sales_2, ncol = 2)
 
 # Consumption-Sales Autonomous Community
 
-```{r}
+```{r, fig.align='center'}
 #Summary autonomous community
 Revenue_Autonomous_community <- orders_retailers_capitals_year %>%
   group_by(Autonomous_community) %>% 
-  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community), Beer_consumption_per_capita = mean(Beer_consumption),
+  summarise(Sales = sum(Revenue), Volume = sum(quantity),
+            Population_community = mean(Population_community),
+            Beer_consumption_per_capita = mean(Beer_consumption),
             Longitude = mean(Longitude), Latitude = mean(Latitude))
 
 Revenue_Autonomous_community <- Revenue_Autonomous_community %>%
-  mutate(Sales_per_capita = Sales / Population_community, Volume_per_capita = Volume / Population_community, Damm_market_percentage = Sales_per_capita/Beer_consumption_per_capita)
+  mutate(Sales_per_capita = Sales / Population_community,
+         Volume_per_capita = Volume / Population_community,
+         Damm_market_percentage = Sales_per_capita/Beer_consumption_per_capita)
 
 Spain_ccaa <- esp_get_ccaa()
 
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Volume_per_capita))
+ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_Autonomous_community,
+             aes(x = Longitude, y = Latitude, size = Sales_per_capita),
+             color = "#004168") +
+    theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "right",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Damm sales per capita (year)")
 
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Beer_consumption_per_capita))
 
-ggplot(Spain_ccaa) + geom_sf() + geom_point(data = Revenue_Autonomous_community,
-                                            aes(x = Longitude, y = Latitude, size = Damm_market_percentage))
+ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_Autonomous_community,
+             aes(x = Longitude, y = Latitude,
+                 size = Beer_consumption_per_capita),
+                 color = "#004168") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "right",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Market spending per capita (year)")
+
+ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_Autonomous_community,
+             aes(x = Longitude, y = Latitude, size = Damm_market_percentage),
+                 color = "#004168") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "right",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Ratio Damm - market")
 ```
 
 # RFM
