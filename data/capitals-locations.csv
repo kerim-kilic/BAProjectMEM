@@ -1,57 +1,57 @@
 ﻿Province,Capital,Autonomous_community,Latitude,Longitude,Altitude,Population,Population_capital
-Albacete,Albacete,Castilla-La Mancha,38.99765,-1.86007,685.9573,"388,270",169716
-Alicante,Alicante,Comunidad Valenciana,38.3452,-0.481006,16.63256,"1,879,888",334757
-Almeria,Almería,Andalucía,36.84016,-2.467922,27.00703,"727,945",188810
-Andorra,ANDORRA,ANDORRA,40.97544,-0.4436573,721.1627,8403,8403
-Avila,Ávila,Castilla y León,40.65642,-4.700323,1129.841,"157,664",56855
-Badajoz,Badajoz,Extremadura,38.8786,-6.970284,192.0375,"672,137",148334
-Barcelona,Barcelona,Cataluña,41.38792,2.169919,19.99069,"5,743,402",1621537
-Vizcaya,Bilbao,País Vasco,43.25696,-2.923441,17.88842,"1,159,443",354860
-Burgos,Burgos,Castilla y León,42.34087,-3.699731,865.8016,"357,650",178966
-Caceres,Cáceres,Extremadura,39.47618,-6.37076,434.6162,"391,850",93131
-Cadiz,Cádiz,Andalucía,36.52969,-6.292657,15.42415,"1,244,049",126766
-Castellon,Castellón de la Plana,Comunidad Valenciana,39.98598,-0.0376709,36,"585,590",180005
-Ceuta,CEUTA,CEUTA,35.88829,-5.316195,13.47725,"84,202",78674
-Ciudad Real,Ciudad Real,Castilla-La Mancha,38.9861,-3.927263,636.7003,"495,045",74014
-Cordoba,Córdoba,Andalucía,37.88473,-4.779152,131.9102,"781,451",328428
-Cuenca,Cuenca,Castilla-La Mancha,40.07183,-2.134005,930.4124,"196,139",55866
-Girona,Gerona,Cataluña,41.9818,2.8237,69.02268,"781,788",96188
-Granada,Granada,Andalucía,37.17649,-3.597929,697.486,"919,168",234325
-Guadalajara,Guadalajara,Castilla-La Mancha,40.62981,-3.166493,714.2177,"261,995",83039
-Huelva,Huelva,Andalucía,37.2571,-6.949555,20.74414,"524,278",148806
-Huesca,Huesca,Aragón,42.1401,-0.408898,467,"222,687",52059
+Albacete,Albacete,Castilla-La Mancha,38.99765,-1.86007,685.9573,388270.00,169716
+Alicante,Alicante,Comunidad Valenciana,38.3452,-0.481006,16.63256,1879888.00,334757
+Almeria,Almería,Andalucía,36.84016,-2.467922,27.00703,727945.00,188810
+Andorra,ANDORRA,ANDORRA,40.97544,-0.4436573,721.1627,8403.00,8403
+Avila,Ávila,Castilla y León,40.65642,-4.700323,1129.841,157664.00,56855
+Badajoz,Badajoz,Extremadura,38.8786,-6.970284,192.0375,672137.00,148334
+Barcelona,Barcelona,Cataluña,41.38792,2.169919,19.99069,5743402.00,1621537
+Vizcaya,Bilbao,País Vasco,43.25696,-2.923441,17.88842,1159443.00,354860
+Burgos,Burgos,Castilla y León,42.34087,-3.699731,865.8016,357650.00,178966
+Caceres,Cáceres,Extremadura,39.47618,-6.37076,434.6162,391850.00,93131
+Cadiz,Cádiz,Andalucía,36.52969,-6.292657,15.42415,1244049.00,126766
+Castellon,Castellón de la Plana,Comunidad Valenciana,39.98598,-0.0376709,36,585590.00,180005
+Ceuta,CEUTA,CEUTA,35.88829,-5.316195,13.47725,84202.00,78674
+Ciudad Real,Ciudad Real,Castilla-La Mancha,38.9861,-3.927263,636.7003,495045.00,74014
+Cordoba,Córdoba,Andalucía,37.88473,-4.779152,131.9102,781451.00,328428
+Cuenca,Cuenca,Castilla-La Mancha,40.07183,-2.134005,930.4124,196139.00,55866
+Girona,Gerona,Cataluña,41.9818,2.8237,69.02268,781788.00,96188
+Granada,Granada,Andalucía,37.17649,-3.597929,697.486,919168.00,234325
+Guadalajara,Guadalajara,Castilla-La Mancha,40.62981,-3.166493,714.2177,261995.00,83039
+Huelva,Huelva,Andalucía,37.2571,-6.949555,20.74414,524278.00,148806
+Huesca,Huesca,Aragón,42.1401,-0.408898,467,222687.00,52059
 Es/,Indeterminado,Indeterminado,37,2,0,,0
 Pirineos (Altos),Indeterminado,Indeterminado,37,2,0,,0
 /,Indeterminado,Indeterminado,37,2,0,,0
-Jaen,Jaén,Andalucía,37.76574,-3.789518,576.3939,"631,381",116557
-Coruña,La Coruña,Galicia,43.37087,-8.395835,16.76067,"1,121,815",246056
-Las Palmas,Las Palmas de Gran Canaria,Canarias,28.12482,-15.43001,7.271036,"1,131,065",381847
-Leon,León,Castilla y León,42.59988,-5.571752,841.3373,"456,439",134305
-Lleida,Lérida,Cataluña,41.61415,0.6257825,166.4499,"438,517",135919
-La Rioja,Logroño,La Rioja,42.46577,-2.449995,396.4728,"319,914",152107
-Lugo,Lugo,Galicia,43.01208,-7.555851,468.2347,"327,946",96678
-Madrid,Madrid,Comunidad de Madrid,40.41669,-3.700346,653.0047,"6,779,888",3255944
-Malaga,Málaga,Andalucía,36.71965,-4.420019,20.76588,"1,685,920",568305
-Melilla,MELILLA,MELILLA,35.29234,-2.938794,10.3337,"87,076",73460
-Murcia,Murcia,Región de Murcia,37.98344,-1.12989,51.07087,"1,511,251",436870
-Ourense,Ourense,Galicia,42.34001,-7.864641,144.5574,"306,650",107742
-Asturias,Oviedo,Asturias,43.36026,-5.844759,238.8659,"1,018,784",224005
-Palencia,Palencia,Castilla y León,42.01246,-4.531175,745.8375,"160,321",82651
-Islas Baleares,Palma,Islas Baleares,39.56951,2.649966,31.92724,"1,171,543",401270
-Navarra,Pamplona,Navarra,42.81721,-1.646767,458.1406,"661,197",198491
-Pontevedra,Pontevedra,Galicia,42.43362,-8.648053,18.60786,"945,408",81576
-Salamanca,Salamanca,Castilla y León,40.96497,-5.663047,802.7915,"329,245",155619
-Guipuzcoa,San Sebastián,País Vasco,43.32074,-1.984421,6.746843,"727,121",185357
-Sta Cruz De Tenerife,Santa Cruz de Tenerife,Canarias,28.46981,-16.25486,41.29388,"1,044,887",222417
-Cantabria,Santander,Cantabria,43.46096,-3.807934,4.1,"582,905",182700
-Segovia,Segovia,Castilla y León,40.94943,-4.119209,1012.785,"153,478",56660
-Sevilla,Sevilla,Andalucía,37.38264,-5.996295,8.265573,"1,950,219",703206
-Soria,Soria,Castilla y León,41.7636,-2.464921,1064.823,"88,884",39528
-Tarragona,Tarragona,Cataluña,41.11866,1.24533,26.26264,"816,772",140323
-Teruel,Teruel,Aragón,40.34411,-1.10691,927.4562,"134,176",35396
-Toledo,Toledo,Castilla-La Mancha,39.85678,-4.024476,524.0618,"703,772",82291
-Valencia,Valencia,Comunidad Valenciana,39.47024,-0.3768049,23.3349,"2,591,875",814208
-Valladolid,Valladolid,Castilla y León,41.65295,-4.728388,699.4927,"520,649",317864
-Alava,Vitoria-Gasteiz,País Vasco,42.84641,-2.667893,534.3582,"333,940",235661
-Zamora,Zamora,Castilla y León,41.50368,-5.743778,657.1658,"170,588",66293
-Zaragoza,Zaragoza,Aragón,41.65629,-0.8765379,204.0027,"972,528",674317
+Jaen,Jaén,Andalucía,37.76574,-3.789518,576.3939,631381.00,116557
+Coruña,La Coruña,Galicia,43.37087,-8.395835,16.76067,1121815.00,246056
+Las Palmas,Las Palmas de Gran Canaria,Canarias,28.12482,-15.43001,7.271036,1131065.00,381847
+Leon,León,Castilla y León,42.59988,-5.571752,841.3373,456439.00,134305
+Lleida,Lérida,Cataluña,41.61415,0.6257825,166.4499,438517.00,135919
+La Rioja,Logroño,La Rioja,42.46577,-2.449995,396.4728,319914.00,152107
+Lugo,Lugo,Galicia,43.01208,-7.555851,468.2347,327946.00,96678
+Madrid,Madrid,Comunidad de Madrid,40.41669,-3.700346,653.0047,6779888.00,3255944
+Malaga,Málaga,Andalucía,36.71965,-4.420019,20.76588,1685920.00,568305
+Melilla,MELILLA,MELILLA,35.29234,-2.938794,10.3337,87076.00,73460
+Murcia,Murcia,Región de Murcia,37.98344,-1.12989,51.07087,1511251.00,436870
+Ourense,Ourense,Galicia,42.34001,-7.864641,144.5574,306650.00,107742
+Asturias,Oviedo,Asturias,43.36026,-5.844759,238.8659,1018784.00,224005
+Palencia,Palencia,Castilla y León,42.01246,-4.531175,745.8375,160321.00,82651
+Islas Baleares,Palma,Islas Baleares,39.56951,2.649966,31.92724,1171543.00,401270
+Navarra,Pamplona,Navarra,42.81721,-1.646767,458.1406,661197.00,198491
+Pontevedra,Pontevedra,Galicia,42.43362,-8.648053,18.60786,945408.00,81576
+Salamanca,Salamanca,Castilla y León,40.96497,-5.663047,802.7915,329245.00,155619
+Guipuzcoa,San Sebastián,País Vasco,43.32074,-1.984421,6.746843,727121.00,185357
+Sta Cruz De Tenerife,Santa Cruz de Tenerife,Canarias,28.46981,-16.25486,41.29388,1044887.00,222417
+Cantabria,Santander,Cantabria,43.46096,-3.807934,4.1,582905.00,182700
+Segovia,Segovia,Castilla y León,40.94943,-4.119209,1012.785,153478.00,56660
+Sevilla,Sevilla,Andalucía,37.38264,-5.996295,8.265573,1950219.00,703206
+Soria,Soria,Castilla y León,41.7636,-2.464921,1064.823,88884.00,39528
+Tarragona,Tarragona,Cataluña,41.11866,1.24533,26.26264,816772.00,140323
+Teruel,Teruel,Aragón,40.34411,-1.10691,927.4562,134176.00,35396
+Toledo,Toledo,Castilla-La Mancha,39.85678,-4.024476,524.0618,703772.00,82291
+Valencia,Valencia,Comunidad Valenciana,39.47024,-0.3768049,23.3349,2591875.00,814208
+Valladolid,Valladolid,Castilla y León,41.65295,-4.728388,699.4927,520649.00,317864
+Alava,Vitoria-Gasteiz,País Vasco,42.84641,-2.667893,534.3582,333940.00,235661
+Zamora,Zamora,Castilla y León,41.50368,-5.743778,657.1658,170588.00,66293
+Zaragoza,Zaragoza,Aragón,41.65629,-0.8765379,204.0027,972528.00,674317
