@@ -14,6 +14,7 @@ output:
 ```{r setup, include = FALSE, message = FALSE, warning = FALSE}
 knitr::opts_chunk$set(echo = TRUE,message = FALSE,warning = FALSE)
 library(tidyverse)
+library(gridExtra)
 library(janitor)
 library (lubridate)
 library(arules)
@@ -481,7 +482,8 @@ retailers_capitals <- merge(retailers, provinces_communities, by.x = "region", b
 orders_retailers_capitals <- merge(orders_prices, retailers_capitals, by = "id_establishment")
 
 orders_retailers_capitals <- orders_retailers_capitals %>% distinct(
-  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude, Autonomous_community ,Population_community,Population, price_liter, Beer_consumption)
+  id_establishment,material, date ,quantity, price, Capital, Latitude, Longitude,
+  Autonomous_community ,Population_community,Population, price_liter, Beer_consumption)
 
 #filter for year 2020
 orders_retailers_capitals_year <- orders_retailers_capitals %>%
@@ -496,7 +498,8 @@ orders_retailers_capitals_year <- orders_retailers_capitals_year %>%
   mutate(Revenue = price_liter * quantity)
 
 Revenue_region <- orders_retailers_capitals_year %>% group_by(Capital) %>%
-  summarise(Sales = sum(Revenue), Volume = sum(quantity), Population_community = mean(Population_community),
+  summarise(Sales = sum(Revenue), Volume = sum(quantity),
+            Population_community = mean(Population_community),
             Longitude = mean(Longitude), Latitude = mean(Latitude))
 
 Revenue_region <- Revenue_region %>% mutate(sales_per_capita = Sales / Population_community)
@@ -505,15 +508,27 @@ Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Populat
 
 ### Sales by volume
 
-```{r}
+```{r, fig.align='center', out.width='100%'}
 Spain <- esp_get_prov()
 
-ggplot(Spain) + geom_sf(fill = "#00AA88", color = "#ffffff") +
-  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume))
+map_vol_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude, size = Volume), color = "#256F72") +
+  theme(legend.title =  element_text(size = 7, ),
+        legend.text = element_text(size = 5),
+        legend.position = "bottom",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Total Volume")
 
-ggplot(Spain) + geom_sf(fill = "#00CC77", color = "#999999") + 
+map_vol_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") + 
   geom_point(data = Revenue_region, aes(x = Longitude, y = Latitude,
-                                        size = Volume_per_capita))
+                                        size = Volume_per_capita))  +
+  theme(legend.title =  element_text(size = 7, ),
+        legend.text = element_text(size = 5),
+        legend.position = "bottom",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Volume per capita")
+
+grid.arrange(map_vol_1, map_vol_2, ncol = 2)
 ```
 
 ### Sales by money
