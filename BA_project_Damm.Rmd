@@ -447,7 +447,7 @@ tab_4%>%head(15)%>%
 ```
 It can be seen that more than 30% of the order lines come from Barcelona, whereas less than 2% come from Vizcaya. 
 
-## Geographical representation
+## Geographical analysis
 It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and in volume.
 
 To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
@@ -544,7 +544,9 @@ Barcelona is by far the province in which the biggest volume of Damm products ar
 with more than **24** millions of liters. In Tarragona, Madrid and Palma around half a million of liters are distributed.
 Now, when comparing the amount sold with the population other facts can be noticed. In this case, Tarragona has the highest consumption per capita a year, with almost 7 liters. Barcelona, Gerona, Logroño and Palma also have remarkable consumption of Damm products with around 4 liters.
 
-### Sales by money
+### Sales expressed in money
+
+It is also convenient to check the performance of the company in the provinces with the results expressed in terms of money. The two maps presented below show the *total of sales* and the *sales per capita* for 2020.
 
 ```{r, fig.align='center', out.width='100%'}
 map_sales_1 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
@@ -572,7 +574,11 @@ map_sales_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
 grid.arrange(map_sales_1, map_sales_2, ncol = 2)
 ```
 
-# Consumption-Sales Autonomous Community
+The results are very similar to those of the sales expressed in volume with a couple of exceptions. Considering the total of sales, Gerona became more important than Palma in terms of money. Regarding the consumption per capita, Logroño has a lower performance, going from second to fourth position.
+
+### Company vs market performance
+
+In the previous section, the performance of Damm was analyzed in the provinces throughout Spain. However, it was considered interesting revising the behavior of sales in comparison with the whole market. To do this, the spending of people in beer was investigated in external sources **(Stata)**. This information was represented in the map below. The community with the highest consumption was Islas Baleares, with **€39.4** on average in *2020*, probably boosted by tourism. On the other hand, in Asturias people spent **€21.3** on average for the same period. In Catalonia, in turn, this number was **€33**.
 
 ```{r, fig.align='center'}
 #Summary autonomous community
@@ -592,19 +598,6 @@ Spain_ccaa <- esp_get_ccaa()
 
 ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   geom_point(data = Revenue_Autonomous_community,
-             aes(x = Longitude, y = Latitude, size = Sales_per_capita),
-             color = "#004168") +
-    theme(axis.title.x = element_text(size = 10),
-        axis.title.y = element_text(size = 10),
-        legend.title =  element_text(size = 8),
-        legend.text = element_text(size = 8),
-        legend.position = "right",
-    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
-  scale_size_continuous(name = "Damm sales per capita (year)")
-
-
-ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
-  geom_point(data = Revenue_Autonomous_community,
              aes(x = Longitude, y = Latitude,
                  size = Beer_consumption_per_capita),
                  color = "#004168") +
@@ -616,6 +609,28 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
     panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
   scale_size_continuous(name = "Market spending per capita (year)")
 
+
+```
+
+Regarding the performance of the company, it has the best results in Catalonia with sales of **8.5** euros per person per year. In Rioja, the outcome was **€7** and in Balearic Island it was **5.7**. On the other side, in 8 of the 17 Autonomous Communities, the consumption per capita was less than **€1** per year, that is, the presence of the companies in those territories is minor.
+
+```{r}
+ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
+  geom_point(data = Revenue_Autonomous_community,
+             aes(x = Longitude, y = Latitude, size = Sales_per_capita),
+             color = "#004168") +
+    theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        legend.title =  element_text(size = 8),
+        legend.text = element_text(size = 8),
+        legend.position = "right",
+    panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
+  scale_size_continuous(name = "Damm sales per capita (year)")
+```
+
+
+
+```{r}
 ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   geom_point(data = Revenue_Autonomous_community,
              aes(x = Longitude, y = Latitude, size = Damm_market_percentage),
@@ -628,6 +643,9 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
     panel.background = element_rect(fill = "lightblue", colour = "lightblue")) +
   scale_size_continuous(name = "Ratio Damm - market")
 ```
+
+
+
 
 # RFM
 
