@@ -771,21 +771,27 @@ segments %>% group_by(segment) %>%
 ```
 More details about the content of this table, are shown in the following graphs.
 
-The plot below allows to analyze the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
+For example, the plot below allows to analyze the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
 ```{r, fig.align='center'}
 ## ----average monetary value----------------------------------------------
 rfm_plot_median_monetary(segments)
 ```
 
+Regarding recency, clients with more than 1000 days with transactions can be considered lost. Conversely, the *champions* are around 30 days.
 ```{r, fig.align='center'}
 ## ----average recency-----------------------------------------------------
 rfm_plot_median_recency(segments)
 ```
 
+Also, when analyzing *frequency*, it is possible to observe that for *lost* and *about to sleep* clients, they just register a few orders. On the other side, *champions* typically have several hundreds.
 ```{r, fig.align='center'}
 ## ----average frequency---------------------------------------------------
 rfm_plot_median_frequency(segments)
 ```
+
+There are several segments which deserve special attention. For instance, *Need attention* or *Others*, which had median expenditures of roughly half a million euros, but with recency days over 100. These are important types of clients that might be in danger. It is required to take care of them.
+
+Additionally, the category *Potential Loyalist* has 67 customers, which had purchased 0.18 million as median, which is not negligible. However, the frequency is low, but they are recent. These are new client that need attention to consolidate the commercial relation.
 
 #CLV
 
@@ -1066,6 +1072,7 @@ formattable(top_rules,
 
 # Conclusions 
 
++
 
 
 
