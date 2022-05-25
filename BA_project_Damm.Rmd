@@ -35,12 +35,15 @@ This documents aims to  help the company DDI to develop a good commercial strate
 The software used for the development of the study and the writing of the report is R[1]. The first step is to define the work directory and to load the libraries: 
 
 * library(tidyverse) [2]
-* library(janitor) [3]
-* library (lubridate)[4]
-* library(arules)[5]
-* library(formattable)[6]
-* library(rfm) [7]
-* library(mapSpain) [8]
+* library(gridExtra) [3]
+* library(janitor) [4]
+* library (lubridate) [5]]
+* library(arules) [6]
+* library(formattable) [7]
+* library(rfm) [8]
+* library("CLVTools") [9]
+* library(mapSpain) [10]
+* library(arulesViz) [11]
 
 # Data
 
@@ -394,7 +397,8 @@ orders_prices_revenue %>%
 
 ```
 
-It can be seen that this graph is aligned with the previuos one. 
+It can be seen that this graph is aligned with the previous one. It shows that by far, the product which more revenues represents is Estrella, with a 66%. Then there is Turia, followed by Free and Lemon. In the lower part of the scale, Xibeca and Equilater are found. 
+
 ## Oreder lines over the years 
 
 Now, an evolution of the order lines over the years will be shown. The data is filtered from 2015 to 2022 in order to have relevant information. 
@@ -408,9 +412,23 @@ orders %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Yea
   geom_point()  + 
   labs(title= "Order Lines over Years", y = " Order lines", x = "Year ") + theme_minimal()
 ```
+## Revenue over the years 
 
-## Order lines over the years  
+```{r}
+orders_prices_revenue$Year <- as.Date(cut(orders_prices_revenue$date,
+                            breaks = "year"))
+
+orders_prices_revenue %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Year) %>% 
+  summarise(rev = sum(Revenue)) %>% ggplot(aes(Year, rev)) + geom_line() +
+  geom_point()  + 
+  labs(title= "Revenue over Years", y = " Order lines", x = "Year ") + theme_minimal()
+```
+
+It can be seen that the revenue graph does not follow the same pattern as the number of order lines one. This is due to the fact that one order line can represent a lot of revenue if the quantity of that order line is really big, or the price of the prodcut is high. It should be noted the peak in revenue in 2018, not seen in the number of order lines graph. 
+
+## Order lines over the months   
 Now, an evolution of the order lines over the months in several years will be shown. The data is filtered from January 2018 to Mat 2021. 
+
 ```{r}
 
 orders$Month <- as.Date(cut(orders$date,
@@ -429,27 +447,27 @@ a1%>%ggplot(aes(Month, count)) + geom_line() +
 ```
 It can be seen that the peaks are located in the month of January of every year The red line shows the moment COVID-19 pandemic restrictions started in Spain. A clear decline in order lines can be seen after this. The peak in 2021 is much lower than the previous ones. 
 
-
-##Top clients 
-Now, the clients with more order lines will be shown in a table. 
-```{r}
-tab_1 <- orders_prices %>%
-  group_by(id_establishment)%>%
-  summarise(count = n()) 
-
-tab_2 <- tab_1[order(-tab_1$count),]
-
-tab_2 %>% head(10)
-```
-
-Also, the clients with only 1 order line will be studdied. 
+## Revenue over the months   
 
 ```{r}
-one_order_line <- tab_2 %>% filter(count == 1) %>% nrow()
-```
-There are `r one_order_line` clients with only 1 order line. 
 
-## Retailers per location
+orders_prices_revenue$Month <- as.Date(cut(orders_prices_revenue$date,
+                            breaks = "month"))
+
+
+a2<- orders_prices_revenue %>% filter(date >= "2018-01-01" & date <= "2021-05-30") %>% group_by(Month) %>% 
+  summarise(rev = round(sum(Revenue),0))
+
+  
+a2%>%ggplot(aes(Month, rev)) + geom_line() +
+  geom_point()+
+  geom_label(data = a2 %>% filter(month(Month) == 1), aes(label=rev))+
+  geom_vline(xintercept = as.numeric(as.Date("2020-03-15")), linetype=5, colour="red")+
+  labs(title= "Revenue over Months", y = " Order lines", x = "Month ") + theme_minimal()
+```
+Here again, it can be seen that the revenue peaks are in January. Again, the 2018 revenue peak mention before, it is seen again. After COVID, the revenue, as the order lines did, decreased. 
+
+## Retailers order lines per location
 
 It is interesting to study where the most order lines come from in terms of location. This will be analysed now. 
 
@@ -470,7 +488,7 @@ tab_4%>%head(15)%>%
   theme(legend.position = "none")
 
 ```
-It can be seen that more than 30% of the order lines come from Barcelona, whereas less than 2% come from Vizcaya. 
+It can be seen that more than 30% of the retailers are located Barcelona, whereas less than 2% are in Vizcaya. 
 
 ## Geographical analysis
 It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and in volume.
@@ -1007,32 +1025,36 @@ formattable(top_rules,
 
 # Conclusions 
 
- 
+
+
 
 # References 
 
-* R Core Team (2022). R: A language and environment for statistical computing. R
+* [1] R Core Team (2022). R: A language and environment for statistical computing. R
   Foundation for Statistical Computing, Vienna, Austria. URL https://www.R-project.org/.
-* Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
+* [2]  Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software,
   4(43), 1686, https://doi.org/10.21105/joss.01686
-* Sam Firke (2021). janitor: Simple Tools for Examining and Cleaning Dirty Data. R
+* [3] Baptiste Auguie (2017). gridExtra: Miscellaneous Functions for "Grid" Graphics. R
+  package version 2.3. https://CRAN.R-project.org/package=gridExtra
+* [4] Sam Firke (2021). janitor: Simple Tools for Examining and Cleaning Dirty Data. R
   package version 2.1.0. https://CRAN.R-project.org/package=janitor
-* Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate.
+* [5] Garrett Grolemund, Hadley Wickham (2011). Dates and Times Made Easy with lubridate.
   Journal of Statistical Software, 40(3), 1-25. URL https://www.jstatsoft.org/v40/i03/.
-* Michael Hahsler, Christian Buchta, Bettina Gruen and Kurt Hornik (2022). arules: Mining
+* [6] Michael Hahsler, Christian Buchta, Bettina Gruen and Kurt Hornik (2022). arules: Mining
   Association Rules and Frequent Itemsets. R package version 1.7-3.
   https://CRAN.R-project.org/package=arules
-* Kun Ren and Kenton Russell (2021). formattable: Create 'Formattable' Data Structures. R
+* [7] Kun Ren and Kenton Russell (2021). formattable: Create 'Formattable' Data Structures. R
   package version 0.2.1. https://CRAN.R-project.org/package=formattable
-* Aravind Hebbali (2020). rfm: Recency, Frequency and Monetary Value Analysis. R package
+* [8] Aravind Hebbali (2020). rfm: Recency, Frequency and Monetary Value Analysis. R package
   version 0.2.2. https://CRAN.R-project.org/package=rfm
-* Patrick Bachmann, Niels Kuebler, Markus Meierer, Jeffrey Naef, Elliot Oblander and
+* [9] Patrick Bachmann, Niels Kuebler, Markus Meierer, Jeffrey Naef, Elliot Oblander and
   Patrik Schilter (2022). CLVTools: Tools for Customer Lifetime Value Estimation. R
   package version 0.9.0. https://CRAN.R-project.org/package=CLVTools
-* Hernangómez D (2022). _mapSpain: Administrative Boundaries of Spain_. doi:
+* [10] Hernangómez D (2022). _mapSpain: Administrative Boundaries of Spain_. doi:
 10.5281/zenodo.5366622 (URL: https://doi.org/10.5281/zenodo.5366622), <URL:
 https://ropenspain.github.io/mapSpain/>.
-
+* [11] Michael Hahsler (2021). arulesViz: Visualizing Association Rules and Frequent Itemsets.
+  R package version 1.5-1. https://CRAN.R-project.org/package=arulesViz
 
 
 
