@@ -32,15 +32,15 @@ This documents aims to  help the company DDI to develop a good commercial strate
 
 # Software Setup
 
-The software used for the development of the study and the writing of the report is. The first step is to define the work directory and to load the libraries: 
+The software used for the development of the study and the writing of the report is R[1]. The first step is to define the work directory and to load the libraries: 
 
-* library(tidyverse)
-* library(janitor)
-* library (lubridate)
-* library(arules)
-* library(formattable)
-* library(rfm)
-* library(mapSpain)
+* library(tidyverse) [2]
+* library(janitor) [3]
+* library (lubridate)[4]
+* library(arules)[5]
+* library(formattable)[6]
+* library(rfm) [7]
+* library(mapSpain) [8]
 
 # Data
 
@@ -184,7 +184,7 @@ orders <- orders %>% filter(quantity != 0)
 ```
 
 ## Cleaning Data "Quantity"
-In this section, the table quantity will be cleaned. First,  the clean_data() function is run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
+In this section, the table quantity will be cleaned. First,  the clean_data() function will be run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 ```{r}
 quantity <- clean_data(quantity) %>% select(-x)
@@ -243,7 +243,7 @@ prices <- prices %>%
 
 ## Merging orders and prices
 
-In order to perform the analysis, the tables orders and prices should be merged. This is done using the merge function, and doing it by the "material" variable. In order to have relevant data, this data is filter from 2002 on wards. 
+In order to perform the analysis, the tables orders and prices should be merged. This is done using the merge function, and doing it by the "material" column In order to have relevant data, this data is filter from 2002 on wards. 
 
 ```{r}
 # Merge orders and prices
@@ -307,7 +307,7 @@ retailers <- subset(retailers, !is.na(retailers$region))
 tabyl(retailers$region)
 ```
 
-Looking through the category data a lot of NA values can be seen, and after checking with the company, it was realized that they are not classified yet. Thus, the will be marked so for now and classify them afterwards as part of the work. 
+Looking through the category data a lot of NA values can be seen, and after checking with the company, it was realized that they are not classified yet. Thus, they will be marked as so for now and classify them afterwards as part of the work. 
 
 ```{r}
 tabyl(retailers$category)
@@ -340,7 +340,9 @@ mutate(region = region.y) %>% select(-region.y)
 
 retailers <- rbind(retailers_noES, retailers_ES)
 ```
+
 The method previously described worked for all the entries in which the value was '/ES'. Additionally, there were a few entries with value '/'. These were simply deleted from the data set.
+
 ```{r}
 retailers <- retailers %>% filter(region != "/")
 ```
@@ -350,10 +352,10 @@ retailers <- retailers %>% filter(region != "/")
 
 In this section of the report, a general overview of the data will be shown using graphs. First, the evolution of order lines over years and month. Then, the top clients will be observed. Following, the most popular client locations will be analysed, as well as the preferred product type. 
 
+## Oreder lines per product type
 As some orders include several order lines, and some only one, this analysis will be done regarding order lines. 
 
-## Oreder lines per product type
-First, the  number of times a type of article appears in an order is counted, and from this, a graph taking into account the percentage is made.  
+First, the number of times a specific article type appears in the dataset is counted, having like that the number of order lines referring to this type of product, Then, from this, a graph taking into account the percentage from the total number of order lines is made.  
 
 ```{r}
 orders_prices %>%
@@ -370,6 +372,29 @@ orders_prices %>%
 
 It can be seen that the most popular product type is Estrella, followed by Free. In the last positions there are Xibeca and Equilated. 
 
+## Revenue per product type
+The same analysis done in the previous point will now be presented taking into account the revenue instead of the number of order lines. 
+
+```{r}
+orders_prices_revenue <- orders_prices %>%
+  mutate(Revenue = price_liter * quantity)
+
+total_rev =  sum(orders_prices_revenue$Revenue)
+
+orders_prices_revenue %>%
+  group_by(type)%>%
+  summarise(rev = sum(Revenue)) %>%
+  mutate(percentage_rev =  round((rev/total_rev)*100,2)) %>%
+  ggplot(aes(reorder(type, percentage_rev), percentage_rev, fill=type))+
+  geom_text(aes(label=percentage_rev), hjust=-0.01)+
+  geom_bar(stat="identity", position = "dodge") + 
+  coord_flip() + 
+  labs(title= "% of Revenue per Product Type", y = "% of Revenue", x = "Type of prodcut") +  
+  theme(legend.position = "none")
+
+```
+
+It can be seen that this graph is aligned with the previuos one. 
 ## Oreder lines over the years 
 
 Now, an evolution of the order lines over the years will be shown. The data is filtered from 2015 to 2022 in order to have relevant information. 
