@@ -355,12 +355,12 @@ retailers <- retailers %>% filter(region != "/")
 
 In this section of the report, a general overview of the data will be shown using graphs. First, the evolution of order lines over years and month. Then, the top clients will be observed. Following, the most popular client locations will be analysed, as well as the preferred product type. 
 
-## Oreder lines per product type
+## Order lines per product type
 As some orders include several order lines, and some only one, this analysis will be done regarding order lines. 
 
 First, the number of times a specific article type appears in the dataset is counted, having like that the number of order lines referring to this type of product, Then, from this, a graph taking into account the percentage from the total number of order lines is made.  
 
-```{r}
+```{r, fig.align='center'}
 orders_prices %>%
   group_by(type)%>%
   summarise(count = n()) %>%
@@ -378,7 +378,7 @@ It can be seen that the most popular product type is Estrella, followed by Free.
 ## Revenue per product type
 The same analysis done in the previous point will now be presented taking into account the revenue instead of the number of order lines. 
 
-```{r}
+```{r, fig.align='center'}
 orders_prices_revenue <- orders_prices %>%
   mutate(Revenue = price_liter * quantity)
 
@@ -399,11 +399,11 @@ orders_prices_revenue %>%
 
 It can be seen that this graph is aligned with the previous one. It shows that by far, the product which more revenues represents is Estrella, with a 66%. Then there is Turia, followed by Free and Lemon. In the lower part of the scale, Xibeca and Equilater are found. 
 
-## Oreder lines over the years 
+## Order lines over the years 
 
 Now, an evolution of the order lines over the years will be shown. The data is filtered from 2015 to 2022 in order to have relevant information. 
 
-```{r}
+```{r, fig.align='center'}
 orders$Year <- as.Date(cut(orders$date,
                             breaks = "year"))
 
@@ -414,7 +414,7 @@ orders %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Yea
 ```
 ## Revenue over the years 
 
-```{r}
+```{r, fig.align='center'}
 orders_prices_revenue$Year <- as.Date(cut(orders_prices_revenue$date,
                             breaks = "year"))
 
@@ -429,8 +429,7 @@ It can be seen that the revenue graph does not follow the same pattern as the nu
 ## Order lines over the months   
 Now, an evolution of the order lines over the months in several years will be shown. The data is filtered from January 2018 to Mat 2021. 
 
-```{r}
-
+```{r, fig.align='center'}
 orders$Month <- as.Date(cut(orders$date,
                             breaks = "month"))
 
@@ -449,7 +448,7 @@ It can be seen that the peaks are located in the month of January of every year 
 
 ## Revenue over the months   
 
-```{r}
+```{r, fig.align='center'}
 
 orders_prices_revenue$Month <- as.Date(cut(orders_prices_revenue$date,
                             breaks = "month"))
@@ -471,7 +470,7 @@ Here again, it can be seen that the revenue peaks are in January. Again, the 201
 
 It is interesting to study where the most order lines come from in terms of location. This will be analysed now. 
 
-```{r}
+```{r, fig.align='center'}
 tab_3 <- retailers %>%
   group_by(region)%>%
   summarise(count = n()) %>%
@@ -657,7 +656,7 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
 
 Regarding the performance of the company, it has the best results in Catalonia with sales of **8.5** euros per person per year. In Rioja, the outcome was **€7** and in Balearic Island it was **5.7**. On the other side, in 8 of the 17 Autonomous Communities, the consumption per capita was less than **€1** per year, that is, the presence of the companies in those territories is minor.
 
-```{r}
+```{r, fig.align='center'}
 ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   geom_point(data = Revenue_Autonomous_community,
              aes(x = Longitude, y = Latitude, size = Sales_per_capita),
@@ -671,9 +670,9 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   scale_size_continuous(name = "Damm sales per capita (year)")
 ```
 
+To verify the previous analysis, the ratio of the per capita consumption of Damm and that of the whole market was prepared. The results are presented in the following map.
 
-
-```{r}
+```{r, fig.align='center'}
 ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   geom_point(data = Revenue_Autonomous_community,
              aes(x = Longitude, y = Latitude, size = Damm_market_percentage),
@@ -687,37 +686,64 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
   scale_size_continuous(name = "Ratio Damm - market")
 ```
 
+According to the calculations, in Catalonia and Rioja **25** cents out of every euro people spend on beer, goes to the Damm unit of business under consideration. Nevertheless, in 11 of the Autonomous Communities, this number is below **5** cents.
 
+In this sense, the company has a great potential of growth in the Communities where so far is not a dominant player.
 
 
 # RFM
 
 Given the historical data about retailers and transactions, it is possible to perform and analysis of Recency, Frequency and Money [spent]. To do this, a revenue column was added.
 
-```{r}
+The *rfm* library was used. The classification is done with the function *rfm_table_order*. In the sake of the analysis, the final date was set at the end of 2020.
+
+```{r, fig.align='center'}
 #add column revenue
 orders_prices <- orders_prices%>% mutate(revenue = quantity * price_liter)
+orders_prices_rfm <- orders_prices %>% filter(date <= "2020-12-31")
 
 ### ----create rfm score -------------------------------------------------------
-rfm_result <- rfm_table_order(orders_prices, customer, date, revenue, Sys.Date())
+rfm_result <- rfm_table_order(orders_prices_rfm, customer, date, revenue, as.Date("2020-12-31"))
+```
 
+## Visual analysis of RFM
+
+The following plots are helpful representing the general distribution of the clients, according to the variables *frequency, recency and money*. For instance, the heat map shown below is useful by telling that most of the revenue is given by the customers which more frequently and most recently have purchased products of the company.
+
+```{r, fig.align='center'}
 ## ----heat map of the situation ----------------------------------------------
 rfm_heatmap(rfm_result)
+```
 
+With the plot below it is possible to assert that the clients with highest recency and frequency, tend to have a high monetary score. That is to say, in the recent history, the most frequent clients, spend important amounts of money, which is good for the company.
+```{r, fig.align='center'}
 ## ----bar chart of the situation ----------------------------------------------
 rfm_bar_chart(rfm_result)
-
+```
+When the whole data is considered, it is possible to see that the distribution of clients in the three variables tend to be asymmetrical, in which most of them do orders of low money, have ordered very recently and have low frequency. 
+This implies that a small bunch of customers have spent big amounts of money in comparison with the rest.
+```{r, fig.align='center'}
 ## ----histogram---------------------------------------------------------------
 rfm_histograms(rfm_result)
+```
+This can be validated by the scatter plot below. There are 5 client that outperform the vast majority. It is observed a trend that says the more frequency, the more money spent.
 
-## ----customer by order---------------------------------------------------------
-rfm_order_dist(rfm_result)
-
+```{r, fig.align='center'}
+## ----histogram---------------------------------------------------------------
+rfm_fm_plot(rfm_result)
+```
+Not surprisingly, clients with better recency score, tend to have higher expenditure and frequency. There are a couple of outliers in the relation recency-frequency. Two clients that used to have a high frequency for a relatively low recency. Those could be customers to take special care of.
+```{r, fig.align='center'}
 ## ----some scatter plots---------------------------------------------------------
 rfm_rm_plot(rfm_result)
-rfm_fm_plot(rfm_result)
-rfm_rf_plot(rfm_result)
 
+rfm_rf_plot(rfm_result)
+```
+
+## RFM clients segmentation
+
+After the preliminary analysis, in the paragraphs below a segmentation is presented according to the RFM scores. First, 11 categories were defined. For example, if certain client has a high value of Recency, Frequency and Money, it is considered a *champion*. If, on the contrary, it has very low values for all the categories, it is a *lost* client. This classification is useful in defining strategies for each client.
+```{r, fig.align='center'}
 ## ======RFM - segments=========================================================
 
 segment_names <- c("Champions", "Loyal Customers", "Potential Loyalist",
@@ -734,17 +760,23 @@ monetary_upper  <- c(5, 5, 3, 1, 1, 4, 2, 5, 5, 3, 1)
 segments <- rfm_segment(rfm_result, segment_names, recency_lower, recency_upper,
                         frequency_lower, frequency_upper, monetary_lower, monetary_upper)
 
+```
 
+The plot below allows to analyze the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
+```{r, fig.align='center'}
 ## ----average monetary value----------------------------------------------
 rfm_plot_median_monetary(segments)
+```
 
+```{r, fig.align='center'}
 ## ----average recency-----------------------------------------------------
 rfm_plot_median_recency(segments)
+```
 
+```{r, fig.align='center'}
 ## ----average frequency---------------------------------------------------
 rfm_plot_median_frequency(segments)
 ```
-
 
 #CLV
 
