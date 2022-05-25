@@ -762,6 +762,15 @@ segments <- rfm_segment(rfm_result, segment_names, recency_lower, recency_upper,
 
 ```
 
+The table below presents how many client Damm have in each category. Additionally, the median of the relevant values: Number of transactions (frequency), Recency days (Recency) and Expenditure (Money).
+```{r, fig.align='center'}
+segments %>% group_by(segment) %>%
+  summarise(Count = n(), Transactions_med = median(transaction_count),
+            Recency_day_med = median(recency_days), Expenditure_med = median(amount))
+
+```
+More details about the content of this table, are shown in the following graphs.
+
 The plot below allows to analyze the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
 ```{r, fig.align='center'}
 ## ----average monetary value----------------------------------------------
