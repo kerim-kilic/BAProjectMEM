@@ -423,6 +423,7 @@ orders_prices_revenue %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %
 It can be seen that the revenue graph does not follow the same pattern as the number of order lines one. This is since one order line can represent a lot of revenue if the quantity of that order line is really big, or the price of the product is high. It should be noted the peak in revenue in 2018, is not seen in the number of order lines graph. 
 
 ## Order lines over the months   
+
 Now, an evolution of the order lines over the months in several years will be shown. The data is filtered from January 2018 to Mat 2021. 
 
 ```{r, fig.align='center'}
@@ -441,7 +442,7 @@ a1%>%ggplot(aes(Month, count)) + geom_line() +
   labs(title= "Order Lines over Months", y = " Order lines", x = "Month ") + theme_minimal()
 ```
 
-It can be seen that the peaks are located in the month of January of every year The red line shows the moment COVID-19 pandemic restrictions started in Spain. A clear decline in order lines can be seen after this. The peak in 2021 is much lower than the previous ones. 
+It can be seen that the number of lines follow a cyclical pattern each year. It can be seen that the peaks are located in the month of January of every year, and the lowest points at the last quarter of the year. The red line shows the moment COVID-19 pandemic restrictions started in Spain. A clear decline in order lines can be seen after this. The peak in 2021 is much lower than the previous ones. 
 
 ## Revenue over the months   
 
@@ -1089,9 +1090,10 @@ formattable(top_rules,
 
 # Conclusions 
 
++ The sales of the company follow a cyclical trend over the year, and this should be considered for doing the specific campaigns at different times of the annual calendar. It should be noted that COVID-19 had an impact on these sales. 
 + The company has a good market position in Catalonia, the Balearic Islands, and Rioja. This implies that it has a lot of potential for growth in the other fourteen Autonomous Communities. A deeper study of the consumption habits of those regions would be helpful.
 + Damm has different kinds of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
-+ From the association rules analysis, we can extract that five product groups are dominant on the right-hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focussing on customers that mostly buy a product from one of these product groups.
++ From the association rules analysis, we can extract that five product groups are dominant on the right-hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focusing on customers that mostly buy a product from one of these product groups.
 
 
 
