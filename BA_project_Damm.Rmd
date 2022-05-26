@@ -1074,6 +1074,7 @@ formattable(top_rules,
 
 + The company has a good market position in Catalonia, Balearic Islands and Rioja. This implies that it has a lot of potencial for growing in the other fourteen Autonomous Communities. A deeper study of the consumption habits for those regions would be helpful.
 + Damm have different kind of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
++ From the association rules analysis we can extract that there are five product groups that are dominant in the right hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focussing on customers that mostly buy a product from one of these product groups.
 
 
 
