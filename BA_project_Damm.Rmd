@@ -492,7 +492,7 @@ It can be seen that more than 30% of the retailers are located Barcelona, wherea
 ## Geographical analysis
 It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and in volume.
 
-To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders.
+To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders [12].
 
 ```{r}
 #retrieving info about communities and provinces
@@ -620,7 +620,7 @@ The results are very similar to those of the sales expressed in volume with a co
 
 ### Company vs market performance
 
-In the previous section, the performance of Damm was analyzed in the provinces throughout Spain. However, it was considered interesting revising the behavior of sales in comparison with the whole market. To do this, the spending of people in beer was investigated in external sources **(Stata)**. This information was represented in the map below. The community with the highest consumption was Islas Baleares, with **€39.4** on average in *2020*, probably boosted by tourism. On the other hand, in Asturias people spent **€21.3** on average for the same period. In Catalonia, in turn, this number was **€33**.
+In the previous section, the performance of Damm was analyzed in the provinces throughout Spain. However, it was considered interesting revising the behavior of sales in comparison with the whole market. To do this, the spending of people in beer was investigated in external sources [13]. This information was represented in the map below. The community with the highest consumption was Islas Baleares, with **€39.4** on average in *2020*, probably boosted by tourism. On the other hand, in Asturias people spent **€21.3** on average for the same period. In Catalonia, in turn, this number was **€33**.
 
 ```{r, fig.align='center'}
 #Summary autonomous community
@@ -1072,7 +1072,8 @@ formattable(top_rules,
 
 # Conclusions 
 
-+
++ The company has a good market position in Catalonia, Balearic Islands and Rioja. This implies that it has a lot of potencial for growing in the other fourteen Autonomous Communities. A deeper study of the consumption habits for those regions would be helpful.
++ Damm have different kind of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
 
 
 
@@ -1103,6 +1104,8 @@ formattable(top_rules,
 https://ropenspain.github.io/mapSpain/>.
 * [11] Michael Hahsler (2021). arulesViz: Visualizing Association Rules and Frequent Itemsets.
   R package version 1.5-1. https://CRAN.R-project.org/package=arulesViz
+* [12] INE, "Cifras oficiales del Padrón," [Online]. Available: https://www.ine.es/jaxiT3/Tabla.htm?t=2853. [Accessed 18 May 2022].
+* [13] Statista, "Volumen de cerveza consumida por persona al año en España entre 2008 y 2020," 2022. [Online]. Available: https://es.statista.com/estadisticas/476791/consumo-per-capita-de-cerveza-en-espana/#:~:text=Consumo%20por%20persona%20de%20cerveza%20en%20Espa%C3%B1a%202008%2D2020&text=En%202020%2C%20una%20persona%20consumi%C3%B3,pa%C3%ADs%20durante%20el%20a%C3%B1o%20pa. [Accessed 18 May 2022].
 
 
 
