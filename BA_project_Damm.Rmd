@@ -812,6 +812,9 @@ Several segments deserve special attention. For instance, *Need attention* or *O
 Additionally, the category *Potential Loyalist* has 67 customers, which had purchased 0.18 million as median, which is not negligible. However, the frequency is low, but they are recent. These are new clients that need attention to consolidate the commercial relation.
 
 # CLV
+The historical data, especially for the recent years, gives also the opportunity to perform the Customer Lifetime Value (CLV) analysis. CLV reflects the total worth (money spend)  by the purchasers during the whole period they were in a relationship with DAMM.
+
+In order to have relevant results, as well as have continuity in customer relationships, the data was first filtered since January 2018 to June 2021.The estimation period was selected as the first three years (156 weeks), thus leaving half a year (the first five months of 2021) for the holdout period.
 
 ```{r}
 orders_prices_clv <- filter(orders_prices, date >= '2018-01-01' & date <= '2021-06-01')
@@ -821,7 +824,7 @@ orders_prices_clv <- orders_prices_clv %>%
   filter(!all(date > as.Date('2021-01-01'))) %>%
   ungroup -> result
 
-clv.apparel <- clvdata(orders_prices_clv,
+clv.transac <- clvdata(orders_prices_clv,
   date.format = "ymd",
   time.unit = "week",
   estimation.split = 156,
@@ -830,27 +833,38 @@ clv.apparel <- clvdata(orders_prices_clv,
   name.price = "revenue"
 )
 
-clv.apparel
-summary (clv.apparel)
+clv.transac
+summary (clv.transac)
 ```
+Above is presented the summary of the transactions data from the customer lifetime perspective. While the table is self-explanatory, it is worth highlighting the *% zero repeaters*, which indicates that 12% did a purchase a single time in 3 years. This metric already leaves a point for a business follow-up and a further deep dive, combined with the RFM results above. This might highlighting specific customers to invest more for boosting up the lifetime value.
+
 
 ## The Estimation Pareto 
+For the probabilistic attrition model the industry-standard Pareto/NBD model was used, and the model parameters were estimated through the pnbd() command accordingly.
 
 ```{r}
-est.pnbd <- pnbd(clv.data = clv.apparel)
+est.pnbd <- pnbd(clv.data = clv.transac)
 est.pnbd
-plot(est.pnbd)
 ```
+The model parameters are now estimated, and the predictions for the holdout period can now be calculated for individual customers. 
 
 ## The prediction for the holdout period
 ```{r}
 pred_holdout <- predict(est.pnbd, predict.spending=TRUE)
-print(pred_holdout)
-print(pred_holdout)[1] 
+print(pred_holdout[1]) 
+```
+One example is presented in a row. The expanded table allows to review the up-to-date actual spendings for each customer, the probability of them being alive, and most importantly: predicted spending and the predicted customer lifetime value. 
 
+```{r}
 plot(est.pnbd, cumulative = FALSE)
+```
+The plot above shows the number of repeat transactions for customers in total. As can be observed, the repeat transactions were down during 2020 lockdown period, which also influenced the prediction model. Nonetheless, the Pareto curve seems stable. 
+Given up-to-current-date data, the model should be able to predict the customer repetitive transactions, as well as CLV, even more accurately.
+
+```{r}
 plot(est.pnbd, cumulative = TRUE)
 ```
+On cumulative plot, the same picture can be observed. The repetition re-accurance trend was broken during the lockdown period. Thus, the current transactions follow the covid trend. Given the post-covid data for training, the model will be even more precise.
 
 
 # Association rule analysis
@@ -1093,6 +1107,7 @@ formattable(top_rules,
 + The sales of the company follow a cyclical trend over the year, and this should be considered for doing the specific campaigns at different times of the annual calendar. It should be noted that COVID-19 had an impact on these sales. 
 + The company has a good market position in Catalonia, the Balearic Islands, and Rioja. This implies that it has a lot of potential for growth in the other fourteen Autonomous Communities. A deeper study of the consumption habits of those regions would be helpful.
 + Damm has different kinds of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
++ Damm has 12% of the recent client base, which has done only one purchase in the last 3 years. This can be taken for consideration for a better focus on those client to increase their engagement with the business.
 + From the association rules analysis, we can extract that five product groups are dominant on the right-hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focusing on customers that mostly buy a product from one of these product groups.
 
 
