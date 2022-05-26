@@ -32,30 +32,28 @@ This documents aims to  help the company DDI to develop a good commercial strate
 
 # Software Setup
 
-The software used for the development of the study and the writing of the report is R[1]. The first step is to define the work directory and to load the libraries: 
+The software used for the development of the study and the writing of the report is R<strong>[1]</strong>. The following libraries are used to develop the code and perform the analysis:
 
-* library(tidyverse) [2]
-* library(gridExtra) [3]
-* library(janitor) [4]
-* library (lubridate) [5]]
-* library(arules) [6]
-* library(formattable) [7]
-* library(rfm) [8]
-* library("CLVTools") [9]
-* library(mapSpain) [10]
-* library(arulesViz) [11]
+* tidyverse <strong>[2]</strong>
+* gridExtra <strong>[3]</strong>
+* janitor <strong>[4]</strong>
+* lubridate <strong>[5]</strong>
+* arules <strong>[6]</strong>
+* formattable <strong>[7]</strong>
+* rfm <strong>[8]</strong>
+* CLVTools <strong>[9]</strong>
+* mapSpain <strong>[10]</strong>
+* arulesViz <strong>[11]</strong>
 
 # Data
 
-The data used in this report is the one provided by DDI. This data is located in 4 different tables, which are: 
+The data used in this report is provided by DDI. There are in total four tables:
 
 * t_detallista
 * material_preu_damm
 * t_material_Freqs
 * t_posiciones
 
-
-Now, the data will be retreived from the four tables just mentioned. 
 
 ```{r, echo = FALSE, message = FALSE}
 retailers <- read.csv("data/t_detallista.csv", encoding = 'UTF-8')
@@ -64,13 +62,11 @@ quantity <- read.csv("data/t_material_Freqs.csv", encoding = 'UTF-8')
 orders <- read.csv("data/t_posiciones.csv", encoding = 'UTF-8')
 ```
 
-[Describe each table and their corresponding variables.]
+The table t_datallista, from now on referred as <strong>retailers</strong>. This table contains information about the retailers, such as: the id of the retailer, establishment, and customer; Geographical location, distributor, category, and the type of the establishment.
 
-The table t_datallista, from now on referred as retailers. This data refers to XXX. 
+In addition, the table material_preu_damm, now referred as prices. This data includes the different products and their prices 
 
-In addition, the table material_preu_damm, now referred as prices. This data includes XXX. 
-
-Then, there is the table t_material_Freqs, now called quantity. This data refers to XXX.  
+Then, there is the table t_material_Freqs, now called quantity. This data refers to the different products and their respective quantity.
 
 Lastly, there is the table t_posiciones, now called orders. This data includes information about the orders placed by each establishment. It includes the ID of the establishment, the date the order was placed, as well as which material was ordered, in which unit of measure and its quantity. 
 
@@ -200,10 +196,7 @@ quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
-### Adding the type of product
-
-It was seen that the products could be grouped by product type. This agrupation is shown now. 
-The product types are: 
+Each product is part of a product group which has multiple products from the same brand. These are the following product groups: 
 
 * AK
 * BOCK
@@ -412,6 +405,7 @@ orders %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Yea
   geom_point()  + 
   labs(title= "Order Lines over Years", y = " Order lines", x = "Year ") + theme_minimal()
 ```
+
 ## Revenue over the years 
 
 ```{r, fig.align='center'}
@@ -733,11 +727,15 @@ This can be validated by the scatter plot below. There are 5 client that outperf
 rfm_fm_plot(rfm_result)
 ```
 Not surprisingly, clients with better recency score, tend to have higher expenditure and frequency. There are a couple of outliers in the relation recency-frequency. Two clients that used to have a high frequency for a relatively low recency. Those could be customers to take special care of.
-```{r, fig.align='center'}
-## ----some scatter plots---------------------------------------------------------
-rfm_rm_plot(rfm_result)
 
-rfm_rf_plot(rfm_result)
+```{r,fig.show='hide'}
+## ----some scatter plots---------------------------------------------------------
+p1 <- rfm_rm_plot(rfm_result)
+p2 <- rfm_rf_plot(rfm_result)
+```
+
+```{r, fig.align='center'}
+grid.arrange(p1,p2,ncol=2)
 ```
 
 ## RFM clients segmentation
@@ -793,7 +791,7 @@ There are several segments which deserve special attention. For instance, *Need 
 
 Additionally, the category *Potential Loyalist* has 67 customers, which had purchased 0.18 million as median, which is not negligible. However, the frequency is low, but they are recent. These are new client that need attention to consolidate the commercial relation.
 
-#CLV
+# CLV
 
 ```{r}
 orders_prices_clv <- filter(orders_prices, date >= '2018-01-01' & date <= '2021-06-01')
@@ -816,7 +814,7 @@ clv.apparel
 summary (clv.apparel)
 ```
 
-### The Estimation Pareto 
+## The Estimation Pareto 
 
 ```{r}
 est.pnbd <- pnbd(clv.data = clv.apparel)
@@ -824,7 +822,7 @@ est.pnbd
 plot(est.pnbd)
 ```
 
-### The prediction for the holdout period
+## The prediction for the holdout period
 ```{r}
 pred_holdout <- predict(est.pnbd, predict.spending=TRUE)
 print(pred_holdout)
@@ -1106,7 +1104,7 @@ https://ropenspain.github.io/mapSpain/>.
 * [11] Michael Hahsler (2021). arulesViz: Visualizing Association Rules and Frequent Itemsets.
   R package version 1.5-1. https://CRAN.R-project.org/package=arulesViz
 * [12] INE, "Cifras oficiales del Padrón," [Online]. Available: https://www.ine.es/jaxiT3/Tabla.htm?t=2853. [Accessed 18 May 2022].
-* [13] Statista, "Volumen de cerveza consumida por persona al año en España entre 2008 y 2020," 2022. [Online]. Available: https://es.statista.com/estadisticas/476791/consumo-per-capita-de-cerveza-en-espana/#:~:text=Consumo%20por%20persona%20de%20cerveza%20en%20Espa%C3%B1a%202008%2D2020&text=En%202020%2C%20una%20persona%20consumi%C3%B3,pa%C3%ADs%20durante%20el%20a%C3%B1o%20pa. [Accessed 18 May 2022].
+* [13] Statista, "Volumen de cerveza consumida por persona al año en España entre 2008 y 2020," 2022. [Online]. Available: https://es.statista.com/estadisticas/476791/consumo-per-capita-de-cerveza-en-espana/. [Accessed 18 May 2022].
 
 
 
