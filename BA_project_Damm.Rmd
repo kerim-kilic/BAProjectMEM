@@ -28,7 +28,7 @@ Sys.setenv(LANG = "sp")
 
 # Introduction
 
-This documents aims to  help the company DDI to develop a good commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
+This documents aims to  help the company DDI to develop an adequate commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
 
 # Software Setup
 
@@ -64,11 +64,11 @@ orders <- read.csv("data/t_posiciones.csv", encoding = 'UTF-8')
 
 The table t_datallista, from now on referred as <strong>retailers</strong>. This table contains information about the retailers, such as: the id of the retailer, establishment, and customer; Geographical location, distributor, category, and the type of the establishment.
 
-In addition, the table material_preu_damm, now referred as prices. This data includes the different products and their prices 
+In addition, the table material_preu_damm, now referred as <strong>prices</strong>. This data includes the different products and their prices 
 
-Then, there is the table t_material_Freqs, now called quantity. This data refers to the different products and their respective quantity.
+Then, there is the table t_material_Freqs, now called <strong>quantity</strong>. This data refers to the different products and their respective quantity.
 
-Lastly, there is the table t_posiciones, now called orders. This data includes information about the orders placed by each establishment. It includes the ID of the establishment, the date the order was placed, as well as which material was ordered, in which unit of measure and its quantity. 
+Lastly, there is the table t_posiciones, now called <strong>orders</strong>. This data includes information about the orders placed by each establishment. It includes the ID of the establishment, the date the order was placed, as well as which material was ordered, in which unit of measure and its quantity. 
 
 The data had some variable names in Spanish. Now, these are translated to English for a better understanding.
 
@@ -117,6 +117,7 @@ The "id_establiment" variable
 ```{r}
 orders %>% tabyl(id_establishment) %>% select (id_establishment) %>% summary()
 ```
+
 There are NA's values, which must be removed. The other values seem to be correct. 
 ```{r}
 orders <- orders %>% filter(!is.na(id_establishment))
@@ -145,8 +146,7 @@ orders$date <- ifelse(orders$date == "2022-07-14", "2021-07-14", as.character(or
 orders <- orders %>% mutate(date =as.Date(date, format = "%Y-%m-%d"))
 ```
 
-The "Customer" variable
-
+The "Customer" variable:
 ```{r}
 orders %>% tabyl(customer) %>% select (customer) %>% summary()
 ```
@@ -156,17 +156,16 @@ The NA's are deleted. The other values seem to be correct.
 orders <- orders %>% filter (!is.na(customer))
 ```
 
-
-The "Unit" variable
+Checking the he "Unit" variable now:
 ```{r}
 orders %>% tabyl(measure_unit)
 empty_unit <- nrow(orders %>% filter(is.na(measure_unit)))
 empty_unit
 ```
 
-There are `r empty_unit` with no unit of measure
+There are `r empty_unit` with no unit of measure.
 
-The "quantity" variable
+The "quantity" variable:
 ```{r}
 orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 ```
@@ -175,7 +174,7 @@ orders %>% tabyl(quantity) %>% select (quantity) %>% summary()
 zero_quantity <- nrow(orders[orders$quantity == 0,])
 ```
 
-There are `r zero_quantity` with zero quantity
+There are `r zero_quantity` with zero quantity.
 
 Those rows with a 0 in quantity are deleted. 
 ```{r}
@@ -183,6 +182,7 @@ orders <- orders %>% filter(quantity != 0)
 ```
 
 ## Cleaning Data "Quantity"
+
 In this section, the table quantity will be cleaned. First,  the clean_data() function will be run to clean the names of the variables, remove the empty rows and columns, remove the columns with only a constant value, remove the duplicate values, and remove the column x since it does not give any important information.
 
 ```{r}
@@ -196,7 +196,7 @@ quantity <- quantity%>%filter(!is.na(material))
 ```
 
 
-Each product is part of a product group which has multiple products from the same brand. These are the following product groups: 
+Each product is part of a product group that has multiple products from the same brand. These are the following product groups: 
 
 * AK
 * BOCK
@@ -239,7 +239,7 @@ prices <- prices %>%
 
 ## Merging orders and prices
 
-In order to perform the analysis, the tables orders and prices should be merged. This is done using the merge function, and doing it by the "material" column In order to have relevant data, this data is filter from 2002 on wards. 
+To perform the analysis, the tables orders, and prices should be merged. This is done using the merge function, and doing it by the "material" column. To have relevant data, this data is filtered from 2002 onwards. 
 
 ```{r}
 # Merge orders and prices
@@ -256,12 +256,12 @@ In this section, the table retailers will be cleaned. First,  the clean_data() f
 retailers <- clean_data(retailers) %>% select(-x)
 ```
 
-Now, it is checked which columns/variables have missing data
+Now, it is checked which columns/variables have missing data.
 ```{r}
 which(colSums(is.na(retailers)) > 0)
 ```
 
-Looking at the types of the restaurants
+Looking at the types of the restaurants.
 ```{r}
 nrow(retailers[is.na(retailers$type),])
 nrow(retailers[is.na(retailers$type2),])
@@ -303,7 +303,7 @@ retailers <- subset(retailers, !is.na(retailers$region))
 tabyl(retailers$region)
 ```
 
-Looking through the category data a lot of NA values can be seen, and after checking with the company, it was realized that they are not classified yet. Thus, they will be marked as so for now and classify them afterwards as part of the work. 
+Looking through the category data a lot of NA values can be seen, and after checking with the company, it was realized that they are not classified yet. Thus, they will be marked as so for now and classify them afterward as part of the work. 
 
 ```{r}
 tabyl(retailers$category)
@@ -313,7 +313,7 @@ retailers$category <- ifelse(is.na(retailers$category), "Non_classified", retail
 
 Last up is the customer values.
 
-There are only `r nrow(retailers[is.na(retailers$customer),])` customer values missing. Since it might be needed clean customer values for later merging with orders table, it will just be removed the rows with NAs, as it will not affect the data anyhow.
+There are only `r nrow(retailers[is.na(retailers$customer),])` customer values missing. Since it might be needed clean customer values for later merging with the orders table, it will just be removed the rows with NAs, as it will not affect the data anyhow.
 
 ```{r}
 retailers <- subset(retailers, !is.na(retailers$customer))
@@ -321,9 +321,9 @@ retailers <- subset(retailers, !is.na(retailers$customer))
 
 ## Cleaning '/ES' values
 
-There are many retailers for which the field **Region** has a value of '/ES'. However, further inspection has shown that in many cases the same establishment has a determined region in another entry. This fact was used to replace the undetermined values '/ES' by a valid value in other entries.
+There are many retailers for which the field **Region** has a value of '/ES'. However, further inspection has shown that in many cases the same establishment has a determined region in another entry. This fact was used to replace the undetermined values '/ES' with a valid value in other entries.
 
-This was done by splitting the data frame in one part containing the values '/ES' in region and another with the rest. Then, the known regions were combined into the unknown by using 'id_establishment'. Finally, both data frames were combined by using **rbind** function.
+This was done by splitting the data frame into one part containing the values '/ES' in the region and another with the rest. Then, the known regions were combined with the unknown by using 'id_establishment'. Finally, both data frames were combined by using **rbind** function.
 
 ```{r}
 retailers_ES <- retailers %>% filter(region == "ES/")
@@ -337,7 +337,7 @@ mutate(region = region.y) %>% select(-region.y)
 retailers <- rbind(retailers_noES, retailers_ES)
 ```
 
-The method previously described worked for all the entries in which the value was '/ES'. Additionally, there were a few entries with value '/'. These were simply deleted from the data set.
+The method previously described worked for all the entries in which the value was '/ES'. Additionally, there were a few entries with the value '/'. These were simply deleted from the data set.
 
 ```{r}
 retailers <- retailers %>% filter(region != "/")
@@ -346,12 +346,12 @@ retailers <- retailers %>% filter(region != "/")
 
 # General overview of the data 
 
-In this section of the report, a general overview of the data will be shown using graphs. First, the evolution of order lines over years and month. Then, the top clients will be observed. Following, the most popular client locations will be analysed, as well as the preferred product type. 
+In this section of the report, a general overview of the data will be shown using graphs. First, is the evolution of order lines over years and months. Then, the top clients will be observed. Following, the most popular client locations will be analyzed, as well as the preferred product type. 
 
 ## Order lines per product type
 As some orders include several order lines, and some only one, this analysis will be done regarding order lines. 
 
-First, the number of times a specific article type appears in the dataset is counted, having like that the number of order lines referring to this type of product, Then, from this, a graph taking into account the percentage from the total number of order lines is made.  
+First, the number of times a specific article type appears in the dataset is counted, having like that the number of order lines referring to this type of product, Then, from this, a graph taking into account the percentage from the total number of order lines are made.  
 
 ```{r, fig.align='center'}
 orders_prices %>%
@@ -369,7 +369,7 @@ orders_prices %>%
 It can be seen that the most popular product type is Estrella, followed by Free. In the last positions there are Xibeca and Equilated. 
 
 ## Revenue per product type
-The same analysis done in the previous point will now be presented taking into account the revenue instead of the number of order lines. 
+The same analysis done in the previous point will now be presented, taking into account the revenue instead of the number of order lines. 
 
 ```{r, fig.align='center'}
 orders_prices_revenue <- orders_prices %>%
@@ -390,7 +390,7 @@ orders_prices_revenue %>%
 
 ```
 
-It can be seen that this graph is aligned with the previous one. It shows that by far, the product which more revenues represents is Estrella, with a 66%. Then there is Turia, followed by Free and Lemon. In the lower part of the scale, Xibeca and Equilater are found. 
+It can be seen that this graph is aligned with the previous one. It shows that by far, the product which more revenue represents is Estrella, with a 66%. Then there is Turia, followed by Free and Lemon. In the lower part of the scale, Xibeca and Equilater are found. 
 
 ## Order lines over the years 
 
@@ -408,6 +408,8 @@ orders %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %>% group_by(Yea
 
 ## Revenue over the years 
 
+The same analysis done in the previous point will now be presented, taking into account the revenue instead of the number of order lines. 
+
 ```{r, fig.align='center'}
 orders_prices_revenue$Year <- as.Date(cut(orders_prices_revenue$date,
                             breaks = "year"))
@@ -418,7 +420,7 @@ orders_prices_revenue %>%  filter(date >= "2015-01-01" & date <= "2022-01-01") %
   labs(title= "Revenue over Years", y = " Order lines", x = "Year ") + theme_minimal()
 ```
 
-It can be seen that the revenue graph does not follow the same pattern as the number of order lines one. This is due to the fact that one order line can represent a lot of revenue if the quantity of that order line is really big, or the price of the prodcut is high. It should be noted the peak in revenue in 2018, not seen in the number of order lines graph. 
+It can be seen that the revenue graph does not follow the same pattern as the number of order lines one. This is since one order line can represent a lot of revenue if the quantity of that order line is really big, or the price of the product is high. It should be noted the peak in revenue in 2018, is not seen in the number of order lines graph. 
 
 ## Order lines over the months   
 Now, an evolution of the order lines over the months in several years will be shown. The data is filtered from January 2018 to Mat 2021. 
@@ -438,9 +440,12 @@ a1%>%ggplot(aes(Month, count)) + geom_line() +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-15")), linetype=5, colour="red")+
   labs(title= "Order Lines over Months", y = " Order lines", x = "Month ") + theme_minimal()
 ```
+
 It can be seen that the peaks are located in the month of January of every year The red line shows the moment COVID-19 pandemic restrictions started in Spain. A clear decline in order lines can be seen after this. The peak in 2021 is much lower than the previous ones. 
 
 ## Revenue over the months   
+
+The same analysis done in the previous point will now be presented, taking into account the revenue instead of the number of order lines. 
 
 ```{r, fig.align='center'}
 
@@ -458,11 +463,12 @@ a2%>%ggplot(aes(Month, rev)) + geom_line() +
   geom_vline(xintercept = as.numeric(as.Date("2020-03-15")), linetype=5, colour="red")+
   labs(title= "Revenue over Months", y = " Order lines", x = "Month ") + theme_minimal()
 ```
-Here again, it can be seen that the revenue peaks are in January. Again, the 2018 revenue peak mention before, it is seen again. After COVID, the revenue, as the order lines did, decreased. 
+
+Here again, it can be seen that the revenue peaks are in January. The 2018 revenue peak mentioned before, is seen again. After COVID, the revenue, as the order lines did, decreased. 
 
 ## Retailers order lines per location
 
-It is interesting to study where the most order lines come from in terms of location. This will be analysed now. 
+It is interesting to study where the most order lines come from in terms of location. This will be analyzed now. 
 
 ```{r, fig.align='center'}
 tab_3 <- retailers %>%
@@ -481,12 +487,14 @@ tab_4%>%head(15)%>%
   theme(legend.position = "none")
 
 ```
-It can be seen that more than 30% of the retailers are located Barcelona, whereas less than 2% are in Vizcaya. 
+
+It can be seen that more than 30% of the retailers are located in Barcelona, whereas less than 2% are in Vizcaya. 
 
 ## Geographical analysis
-It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and in volume.
 
-To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge in several occasions, this kind of data was connected with the orders [12].
+It was also considered of interest the geographical distribution of variables such as\ sales, expressed in terms of money and volume.
+
+To perform this analysis, an external data set 'Provinces' with geographical and population information was imported. By using merge on several occasions, this kind of data was connected with the orders [12].
 
 ```{r}
 #retrieving info about communities and provinces
@@ -526,7 +534,8 @@ orders_retailers_capitals_year <- orders_retailers_capitals %>%
   filter(date >= "2020-01-01" & date <= "2020-12-31")
 ```
 
-Aggregated and per capital field were added to represent sales money and volume wise for the different provinces of Spain.
+Aggregated and per capital fields were added to represent sales money and volume-wise for the different provinces of Spain.
+
 ```{r}
 #summary for map
 #adding revenue
@@ -545,8 +554,7 @@ Revenue_region <- Revenue_region %>% mutate(Volume_per_capita = Volume / Populat
 ### Sales by volume
 
 After preparing the data for Spain, two plots were prepared to represent 
-the sales of Damm for every province. The map on the left represent the amount of
-liters sold in *2020*. Additionally, in order to consider the effect of the population,on the right it is possible to see the representation of the average consumption of beer Damm in the same year. 
+the sales of Damm for every province. The map on the left represents the number of liters sold in *2020*. Additionally, in order to consider the effect of the population, on the right it is possible to see the representation of the average consumption of beer Damm in the same year. 
 
 ```{r, fig.align='center', out.width='100%'}
 Spain <- esp_get_prov()
@@ -576,9 +584,9 @@ map_vol_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
 
 grid.arrange(map_vol_1, map_vol_2, ncol = 2)
 ```
-Barcelona is by far the province in which the biggest volume of Damm products are sold,
-with more than **24** millions of liters. In Tarragona, Madrid and Palma around half a million of liters are distributed.
-Now, when comparing the amount sold with the population other facts can be noticed. In this case, Tarragona has the highest consumption per capita a year, with almost 7 liters. Barcelona, Gerona, Logroño and Palma also have remarkable consumption of Damm products with around 4 liters.
+
+Barcelona is by far the province in which the biggest volume of Damm products is sold, with more than **24** million liters. In Tarragona, Madrid, and Palma around half a million liters are distributed.
+Now, when comparing the amount sold with the population other facts can be noticed. In this case, Tarragona has the highest consumption per capita a year, with almost 7 liters. Barcelona, Gerona, Logroño, and Palma also have remarkable consumption of Damm products with around 4 liters.
 
 ### Sales expressed in money
 
@@ -610,11 +618,11 @@ map_sales_2 <- ggplot(Spain) + geom_sf(fill = "#4ED09A", color = "#000000") +
 grid.arrange(map_sales_1, map_sales_2, ncol = 2)
 ```
 
-The results are very similar to those of the sales expressed in volume with a couple of exceptions. Considering the total of sales, Gerona became more important than Palma in terms of money. Regarding the consumption per capita, Logroño has a lower performance, going from second to fourth position.
+The results are very similar to those of the sales expressed in volume with a couple of exceptions. Considering the total of sales, Gerona became more important than Palma in terms of money. Regarding the consumption per capita, Logroño has lower performance, going from second to the fourth position.
 
 ### Company vs market performance
 
-In the previous section, the performance of Damm was analyzed in the provinces throughout Spain. However, it was considered interesting revising the behavior of sales in comparison with the whole market. To do this, the spending of people in beer was investigated in external sources [13]. This information was represented in the map below. The community with the highest consumption was Islas Baleares, with **€39.4** on average in *2020*, probably boosted by tourism. On the other hand, in Asturias people spent **€21.3** on average for the same period. In Catalonia, in turn, this number was **€33**.
+In the previous section, the performance of Damm was analyzed in the provinces throughout Spain. However, it was considered interesting to revise the behavior of sales in comparison with the whole market. To do this, the spending of people on beer was investigated by external sources [13]. This information was represented in the map below. The community with the highest consumption was Islas Baleares, with **€39.4** on average in *2020*, probably boosted by tourism. On the other hand, in Asturias people spent **€21.3** on average for the same period. In Catalonia, in turn, this number was **€33**.
 
 ```{r, fig.align='center'}
 #Summary autonomous community
@@ -648,7 +656,7 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
 
 ```
 
-Regarding the performance of the company, it has the best results in Catalonia with sales of **8.5** euros per person per year. In Rioja, the outcome was **€7** and in Balearic Island it was **5.7**. On the other side, in 8 of the 17 Autonomous Communities, the consumption per capita was less than **€1** per year, that is, the presence of the companies in those territories is minor.
+Regarding the performance of the company, it has the best results in Catalonia with sales of **8.5** euros per person per year. In Rioja, the outcome was **€7** and in Balearic Islands, it was **5.7**. On the other side, in 8 of the 17 Autonomous Communities, the consumption per capita was less than **€1** per year, that is, the presence of the companies in those territories is minor.
 
 ```{r, fig.align='center'}
 ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
@@ -682,14 +690,14 @@ ggplot(Spain_ccaa) + geom_sf(fill = "#4ED09A", color = "#000000") +
 
 According to the calculations, in Catalonia and Rioja **25** cents out of every euro people spend on beer, goes to the Damm unit of business under consideration. Nevertheless, in 11 of the Autonomous Communities, this number is below **5** cents.
 
-In this sense, the company has a great potential of growth in the Communities where so far is not a dominant player.
+In this sense, the company has a great potential for growth in the Communities where so far is not a dominant player.
 
 
 # RFM
 
-Given the historical data about retailers and transactions, it is possible to perform and analysis of Recency, Frequency and Money [spent]. To do this, a revenue column was added.
+Given the historical data about retailers and transactions, it is possible to perform an analysis of Recency, Frequency, and Money [spent]. To do this, a revenue column was added.
 
-The *rfm* library was used. The classification is done with the function *rfm_table_order*. In the sake of the analysis, the final date was set at the end of 2020.
+The *rfm* library was used. The classification is done with the function *rfm_table_order*. For the sake of the analysis, the final date was set at the end of 2020.
 
 ```{r, fig.align='center'}
 #add column revenue
@@ -702,30 +710,35 @@ rfm_result <- rfm_table_order(orders_prices_rfm, customer, date, revenue, as.Dat
 
 ## Visual analysis of RFM
 
-The following plots are helpful representing the general distribution of the clients, according to the variables *frequency, recency and money*. For instance, the heat map shown below is useful by telling that most of the revenue is given by the customers which more frequently and most recently have purchased products of the company.
+The following plots help represent the general distribution of the clients, according to the variables *frequency, recency and money*. For instance, the heat map shown below is useful by telling that most of the revenue is given by the customers who more frequently and most recently have purchased products of the company.
 
 ```{r, fig.align='center'}
 ## ----heat map of the situation ----------------------------------------------
 rfm_heatmap(rfm_result)
 ```
 
-With the plot below it is possible to assert that the clients with highest recency and frequency, tend to have a high monetary score. That is to say, in the recent history, the most frequent clients, spend important amounts of money, which is good for the company.
+With the plot below it is possible to assert that the clients with the highest recency and frequency, tend to have a high monetary score. That is to say, in recent history, the most frequent clients, spend important amounts of money, which is good for the company.
+
 ```{r, fig.align='center'}
 ## ----bar chart of the situation ----------------------------------------------
 rfm_bar_chart(rfm_result)
 ```
-When the whole data is considered, it is possible to see that the distribution of clients in the three variables tend to be asymmetrical, in which most of them do orders of low money, have ordered very recently and have low frequency. 
-This implies that a small bunch of customers have spent big amounts of money in comparison with the rest.
+
+When the whole data is considered, it is possible to see that the distribution of clients in the three variables tends to be asymmetrical, in which most of them do orders of low money, have ordered very recently and have a low frequency. 
+This implies that a small bunch of customers has spent big amounts of money in comparison with the rest.
+
 ```{r, fig.align='center'}
 ## ----histogram---------------------------------------------------------------
 rfm_histograms(rfm_result)
 ```
-This can be validated by the scatter plot below. There are 5 client that outperform the vast majority. It is observed a trend that says the more frequency, the more money spent.
+
+This can be validated by the scatter plot below. There are 5 clients that outperform the vast majority. It is observed a trend that says the more frequency, the more money spent.
 
 ```{r, fig.align='center'}
 ## ----histogram---------------------------------------------------------------
 rfm_fm_plot(rfm_result)
 ```
+
 Not surprisingly, clients with better recency score, tend to have higher expenditure and frequency. There are a couple of outliers in the relation recency-frequency. Two clients that used to have a high frequency for a relatively low recency. Those could be customers to take special care of.
 
 ```{r,fig.show='hide'}
@@ -741,6 +754,7 @@ grid.arrange(p1,p2,ncol=2)
 ## RFM clients segmentation
 
 After the preliminary analysis, in the paragraphs below a segmentation is presented according to the RFM scores. First, 11 categories were defined. For example, if certain client has a high value of Recency, Frequency and Money, it is considered a *champion*. If, on the contrary, it has very low values for all the categories, it is a *lost* client. This classification is useful in defining strategies for each client.
+
 ```{r, fig.align='center'}
 ## ======RFM - segments=========================================================
 
@@ -761,35 +775,40 @@ segments <- rfm_segment(rfm_result, segment_names, recency_lower, recency_upper,
 ```
 
 The table below presents how many client Damm have in each category. Additionally, the median of the relevant values: Number of transactions (frequency), Recency days (Recency) and Expenditure (Money).
+
 ```{r, fig.align='center'}
 segments %>% group_by(segment) %>%
   summarise(Count = n(), Transactions_med = median(transaction_count),
             Recency_day_med = median(recency_days), Expenditure_med = median(amount))
 
 ```
+
 More details about the content of this table, are shown in the following graphs.
 
-For example, the plot below allows to analyze the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
+For example, the plot below allows the abalysis of the distribution of money for the proposed categories. For example, clients of the type *Champion* have purchased with a median value of roughly 3.5 million euros. 
+
 ```{r, fig.align='center'}
 ## ----average monetary value----------------------------------------------
 rfm_plot_median_monetary(segments)
 ```
 
 Regarding recency, clients with more than 1000 days with transactions can be considered lost. Conversely, the *champions* are around 30 days.
+
 ```{r, fig.align='center'}
 ## ----average recency-----------------------------------------------------
 rfm_plot_median_recency(segments)
 ```
 
-Also, when analyzing *frequency*, it is possible to observe that for *lost* and *about to sleep* clients, they just register a few orders. On the other side, *champions* typically have several hundreds.
+Also, when analyzing *frequency*, it is possible to observe that for *lost* and *about to sleep* clients, they just register a few orders. On the other side, *champions* typically have several hundred.
+
 ```{r, fig.align='center'}
 ## ----average frequency---------------------------------------------------
 rfm_plot_median_frequency(segments)
 ```
 
-There are several segments which deserve special attention. For instance, *Need attention* or *Others*, which had median expenditures of roughly half a million euros, but with recency days over 100. These are important types of clients that might be in danger. It is required to take care of them.
+Several segments deserve special attention. For instance, *Need attention* or *Others*, had median expenditures of roughly half a million euros, but with recency days over 100. These are important types of clients that might be in danger. It is required to take care of them.
 
-Additionally, the category *Potential Loyalist* has 67 customers, which had purchased 0.18 million as median, which is not negligible. However, the frequency is low, but they are recent. These are new client that need attention to consolidate the commercial relation.
+Additionally, the category *Potential Loyalist* has 67 customers, which had purchased 0.18 million as median, which is not negligible. However, the frequency is low, but they are recent. These are new clients that need attention to consolidate the commercial relation.
 
 # CLV
 
@@ -861,7 +880,7 @@ table <- new_data %>%
 matrix <- as(table %>% select(-transaction_id), "transactions")
 ```
 
-Mining the association rules with a support of at least 0.01, and a confidence of at least 0.8. There is slightly more than 10.000 transactions, this means that for the association rules mined the item combination occurs in at least around 100 transactions. And a confidence level of 0.8 means that in 80% of the cases this lead to the item on the right hand. With these confidence and suport settings 359 association rules are mined. On the right hand side the most dominant product categories are Daura, Turia, Lemon, Free, and Estrella, which will be dived into deeper in the following sections.
+Mining the association rules with a support of at least 0.01, and a confidence of at least 0.8. There are slightly more than 10.000 transactions, this means that for the association rules mined the item combination occurs in at least 100 transactions. And a confidence level of 0.8 means that in 80% of the cases this leads to the item on the right hand. With these confidence and support settings, 359 association rules are mined. On the right-hand side the most dominant product categories are Daura, Turia, Lemon, Free, and Estrella, which will be dived into deeper in the following sections.
 
 ```{r}
 ########################################
@@ -900,7 +919,7 @@ plot(rules_pruned, measure = c("support", "confidence"))
 
 ## Daura product group relevant association rules
 
-Since Daura is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+Since Daura is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific to this product category.
 
 ```{r}
 ##################################################
@@ -922,7 +941,7 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-The following table shows the top relevant association rules for the Daura product group. This means that any customer that buys the products in the left hand side is very likely to buy a Daura product.
+The following table shows the top relevant association rules for the Daura product group. This means that any customer that buys the products on the left-hand side is very likely to buy a Daura product.
 
 ```{r}
 top_rules <- rules_df %>% head(10)
@@ -934,7 +953,7 @@ formattable(top_rules,
 
 ## Turia product group relevant association rules
 
-Since Turia is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+Since Turia is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific to this product category.
 
 ```{r}
 ##################################################
@@ -956,7 +975,7 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-The following table shows the top relevant association rules for the Turia product group. This means that any customer that buys the products in the left hand side is very likely to buy a Turia product.
+The following table shows the top relevant association rules for the Turia product group. This means that any customer that buys the products on the left-hand side is very likely to buy a Turia product.
 
 ```{r}
 top_rules <- rules_df %>% head(10)
@@ -990,7 +1009,7 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-The following table shows the top relevant association rules for the Lemon product group. This means that any customer that buys the products in the left hand side is very likely to buy a Lemon product.
+The following table shows the top relevant association rules for the Lemon product group. This means that any customer that buys the products on the left-hand side is very likely to buy a Lemon product.
 
 ```{r}
 top_rules <- rules_df %>% head(10)
@@ -1002,7 +1021,7 @@ formattable(top_rules,
 
 ## Free product group relevant association rules
 
-Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific to this product category.
 
 ```{r}
 ##################################################
@@ -1024,7 +1043,7 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-The following table shows the top relevant association rules for the Free product group. This means that any customer that buys the products in the left hand side is very likely to buy a Free product.
+The following table shows the top relevant association rules for the Free product group. This means that any customer that buys the products on the left-hand side is very likely to buy a Free product.
 
 ```{r}
 top_rules <- rules_df %>% head(10)
@@ -1036,7 +1055,7 @@ formattable(top_rules,
 
 ## Estrella product group relevant association rules
 
-Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific for this product category.
+Since Free is part of the more dominant product categories present in the previously mined association rules, the following code will mine rules specific to this product category.
 
 ```{r}
 ######################################################
@@ -1058,7 +1077,7 @@ rules_pruned <- rules[!redundant]
 rules_df <- as(rules_pruned, "data.frame")[ , c(1:3, 5)]
 ```
 
-The following table shows the top relevant association rules for the Estrella product group. This means that any customer that buys the products in the left hand side is very likely to buy a Estrella product.
+The following table shows the top relevant association rules for the Estrella product group. This means that any customer that buys the products on the left-hand side is very likely to buy a Estrella product.
 
 ```{r}
 top_rules <- rules_df %>% head(10)
@@ -1070,9 +1089,9 @@ formattable(top_rules,
 
 # Conclusions 
 
-+ The company has a good market position in Catalonia, Balearic Islands and Rioja. This implies that it has a lot of potencial for growing in the other fourteen Autonomous Communities. A deeper study of the consumption habits for those regions would be helpful.
-+ Damm have different kind of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
-+ From the association rules analysis we can extract that there are five product groups that are dominant in the right hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focussing on customers that mostly buy a product from one of these product groups.
++ The company has a good market position in Catalonia, the Balearic Islands, and Rioja. This implies that it has a lot of potential for growth in the other fourteen Autonomous Communities. A deeper study of the consumption habits of those regions would be helpful.
++ Damm has different kinds of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
++ From the association rules analysis, we can extract that five product groups are dominant on the right-hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focussing on customers that mostly buy a product from one of these product groups.
 
 
 
