@@ -28,7 +28,7 @@ Sys.setenv(LANG = "sp")
 
 # Introduction
 
-This documents aims to  help the company DDI to develop an adequate commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. 
+This documents aims to  help the company DDI to develop an adequate commercial strategy based on data, making specific marketing proposals for the different products. In order to do so, first the data will be cleaned. Following, a general overview of the data available will be shown. Then, a RFM analysis will take place, followed by a CLV one. After this, some association rules will be studied. Lastly, this project's conclusions will be presented. The code for this project can be found on the following GitHub repository: <a href="https://github.com/kerim-kilic/BAProjectMEM">"https://github.com/kerim-kilic/BAProjectMEM"</a>
 
 # Software Setup
 
