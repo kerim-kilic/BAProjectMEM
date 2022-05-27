@@ -859,10 +859,23 @@ print(pred_holdout[1])
 One example is presented in a row. The expanded table allows to review the up-to-date actual spendings for each customer, the probability of them being alive, and most importantly: predicted spending and the predicted customer lifetime value. 
 
 ```{r}
+pred_holdout <- filter(pred_holdout, pred_holdout$actual.total.spending < 5000000)
+options(scipen=5)
+plot(x=pred_holdout$actual.x, y=pred_holdout$actual.total.spending,
+     pch = 23,
+     col = 3,
+     xlab = "Number of actual transactions",
+     ylab = "Toal spending",
+     main = "Correlation between # of transactions and customer total spending")
+```
+
+Evidently, there are customers, which purchase frequently (more than 10 times in recent 3 years), while their value is still low. Maybe it will make sense either marketing them more for bigger order volumes. Or reducing the number or purchases, keeping the same cumulative volume, to reduce the purchase and transportation costs.
+
+```{r}
 plot(est.pnbd, cumulative = FALSE)
 ```
 
-The plot above shows the number of repeat transactions for customers in total. As can be observed, the repeat transactions were down during 2020 lockdown period, which also influenced the prediction model. Nonetheless, the Pareto curve seems stable. 
+The plot above shows the number of repeat transactions for customers in total. As can be observed, the repeat transactions were down during 2020 lock down period, which also influenced the prediction model. Nonetheless, the Pareto curve seems stable. 
 Given up-to-current-date data, the model should be able to predict the customer repetitive transactions, as well as CLV, even more accurately.
 
 ```{r}
@@ -1113,6 +1126,8 @@ formattable(top_rules,
 + The company has a good market position in Catalonia, the Balearic Islands, and Rioja. This implies that it has a lot of potential for growth in the other fourteen Autonomous Communities. A deeper study of the consumption habits of those regions would be helpful.
 + Damm has different kinds of clients that deserve special attention. First, there are 67 that have a high expenditure level, but just until recently started purchasing (*Potential loyalist*). A strategy to consolidate this group is needed. In other categories like *Need attention* and *Others* the frequency is good but the recency is declining, then it is important to reactivate these clients.
 + Damm has 12% of the recent client base, which has done only one purchase in the last 3 years. This can be taken for consideration for a better focus on those client to increase their engagement with the business.
++ On the other hand, the company has clients that order frequently, while their total contribution to the revenue is not that efficient. 
++ Those can be observed in more details for business decisions follow-up, through the CLV model obtained in this analysis.
 + From the association rules analysis, we can extract that five product groups are dominant on the right-hand side for a good level of lift and confidence. These are: Daura, Turia, Lemon, Free and Estrella. A special marketing campaign can be created focusing on customers that mostly buy a product from one of these product groups.
 
 
