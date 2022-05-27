@@ -836,6 +836,7 @@ clv.transac <- clvdata(orders_prices_clv,
 clv.transac
 summary (clv.transac)
 ```
+
 Above is presented the summary of the transactions data from the customer lifetime perspective. While the table is self-explanatory, it is worth highlighting the *% zero repeaters*, which indicates that 12% did a purchase a single time in 3 years. This metric already leaves a point for a business follow-up and a further deep dive, combined with the RFM results above. This might highlighting specific customers to invest more for boosting up the lifetime value.
 
 
@@ -846,6 +847,7 @@ For the probabilistic attrition model the industry-standard Pareto/NBD model was
 est.pnbd <- pnbd(clv.data = clv.transac)
 est.pnbd
 ```
+
 The model parameters are now estimated, and the predictions for the holdout period can now be calculated for individual customers. 
 
 ## The prediction for the holdout period
@@ -853,17 +855,20 @@ The model parameters are now estimated, and the predictions for the holdout peri
 pred_holdout <- predict(est.pnbd, predict.spending=TRUE)
 print(pred_holdout[1]) 
 ```
+
 One example is presented in a row. The expanded table allows to review the up-to-date actual spendings for each customer, the probability of them being alive, and most importantly: predicted spending and the predicted customer lifetime value. 
 
 ```{r}
 plot(est.pnbd, cumulative = FALSE)
 ```
+
 The plot above shows the number of repeat transactions for customers in total. As can be observed, the repeat transactions were down during 2020 lockdown period, which also influenced the prediction model. Nonetheless, the Pareto curve seems stable. 
 Given up-to-current-date data, the model should be able to predict the customer repetitive transactions, as well as CLV, even more accurately.
 
 ```{r}
 plot(est.pnbd, cumulative = TRUE)
 ```
+
 On cumulative plot, the same picture can be observed. The repetition re-accurance trend was broken during the lockdown period. Thus, the current transactions follow the covid trend. Given the post-covid data for training, the model will be even more precise.
 
 
